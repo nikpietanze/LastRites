@@ -9,7 +9,7 @@ First release.
 - 900 class-themed lines, 100 for each class, mixed into about half your rites (turn off with "Class-themed lines").
 - Lines name the victim's class, race, the zone and the spell that killed them.
 - Nemesis lines once you've killed the same player a few times, counting the funerals.
-- Native options panel: master switch, tone, what to perform (emote and prayer, emote only, prayer only), class-themed lines, avoid emotes that pose your character, battlegrounds, arenas and world PvP toggles, chance per kill, cooldown, nemesis lines and threshold. Preview, Test, Your nemeses and Reset kill counts buttons included.
+- Native options panel: master switch, tone, what to perform (emote and prayer, emote only, prayer only), class-themed lines, avoid emotes that move your character (on by default: a still emote like `/mourn` plays in place of `/pray`, `/kneel`, `/bow`, `/salute` and `/cry`, which WoW refuses while you move), battlegrounds, arenas and world PvP toggles, chance per kill, cooldown, nemesis lines and threshold. Preview, Test, Your nemeses and Reset kill counts buttons included.
 - The prayer goes out on your next key press after the kill, since WoW only sends addon emote text during a key press. No key press within 1.5 seconds, no prayer.
 - Prayers follow on from their emote instead of restating it.
 - WoW refuses emotes while you move, so a rite watches for its emote in chat and tries again on a key press or when you stop moving, for up to 1.5 seconds. Retries aim at the victim, never your new target. The prayer waits for the emote so they read in order, and goes out no later than 3 seconds after the kill.

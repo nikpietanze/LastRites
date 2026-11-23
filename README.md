@@ -16,12 +16,12 @@
 </p>
 
 ```
-Aldric kneels before Grimgor.
-Aldric kneels beside Grimgor. "Blessed are the repair bills, for they shall be many."
+In quiet contemplation, Aldric mourns the death of Grimgor.
+Aldric dusts off Grimgor's armor. "Blessed are the repair bills, for they shall be many."
 ```
 
 - **Emote only.** No `/say`, no `/yell`, no chat spam. Every rite is a built-in emote at the corpse plus one `/e` line.
-- **The other faction sees it.** Built-in emotes like `/kneel`, `/pray` and `/violin` cross factions, so your victim sees "Aldric kneels before you." Your faction reads the full prayer. The enemy sees "Aldric makes some strange gestures," which somehow makes it better.
+- **The other faction sees it.** Built-in emotes like `/mourn`, `/comfort` and `/violin` cross factions, so your victim sees "Aldric mourns the death of you." or similar. Your faction reads the full prayer. The enemy sees "Aldric makes some strange gestures," which somehow makes it better.
 - **Two tones.** 100 reverent prayers in the King James style, 100 satirical eulogies, or a coin flip between them.
 - **Written for your class.** 100 more lines for each of the nine classes, mixed into about half your rites. Paladins invoke the Light, warlocks shard the soul, rogues check the pockets, hunters let the pet sniff the corpse.
 - **Short.** Every line is 10 to 20 words, so people actually read it mid-fight.
@@ -34,7 +34,7 @@ Everything is under **Esc → Options → AddOns → Last Rites** (or type `/rit
 
 | Section | Settings |
 |---|---|
-| Rites | Perform last rites (master switch), tone (mixed, reverent or satirical), what to perform (emote and prayer, emote only, or prayer only), class-themed lines, avoid emotes that pose your character (skips `/kneel`, on by default) |
+| Rites | Perform last rites (master switch), tone (mixed, reverent or satirical), what to perform (emote and prayer, emote only, or prayer only), class-themed lines, avoid emotes that move your character (plays `/mourn` or `/comfort` in place of `/pray`, `/kneel`, `/bow`, `/salute` and `/cry`, which WoW refuses while you move; on by default) |
 | Where | Battlegrounds, arenas, world PvP |
 | Timing | Chance per kill, cooldown between rites |
 | Nemesis | Nemesis lines, kills to become a nemesis |

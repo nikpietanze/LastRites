@@ -362,28 +362,33 @@ test("tone reverent only draws reverent lines", function()
 	end
 end)
 
-test("avoid poses skips /kneel lines (on by default), unless only the prayer is sent", function()
+test("avoid poses plays a still emote for animated ones (on by default), keeping the line", function()
 	local W = fresh()
 	eq(W.ns.db.avoidPoses, true, "default")
+	local animated = { PRAY = true, KNEEL = true, BOW = true, SALUTE = true, CRY = true }
+	local drewAnimated = false
+	W.target = { name = "Bob", guid = "Player-9-BOB" }
+	for i = 1, 300 do
+		local p = W.ns.Pick(1)
+		if animated[p[1]] then drewAnimated = true end
+		local token = W.ns.EmoteFor(p)
+		assert(not animated[token], "played /" .. token:lower())
+		local verbs = { MOURN = "mourn", COMFORT = "comfort", SIGH = "sigh" }
+		if token ~= p[1] then
+			assert(not p[2]:lower():find(verbs[token], 1, true), "restates /" .. token:lower() .. ": " .. p[2])
+		end
+	end
+	assert(drewAnimated, "lines with animated emotes are still used")
+	W.clear()
+	for i = 1, 30 do W.advance(100); kill(W); W.press() end
+	for _, e in ipairs(W.emotes) do assert(not animated[e[1]], "performed /" .. e[1]:lower()) end
+	W.ns.db.avoidPoses = false
+	local kept = false
 	for _ = 1, 300 do
 		local p = W.ns.Pick(1)
-		assert(p[1] ~= "KNEEL", "drew a /kneel line")
-		p = W.ns.Pick(5)
-		assert(p[1] ~= "KNEEL", "drew a /kneel nemesis line")
+		if animated[p[1]] and W.ns.EmoteFor(p) == p[1] then kept = true end
 	end
-	W.ns.db.mode = "custom"
-	local kneels = 0
-	for _ = 1, 300 do
-		if W.ns.Pick(1)[1] == "KNEEL" then kneels = kneels + 1 end
-	end
-	assert(kneels > 0, "prayer-only mode uses every line")
-	W.ns.db.mode = "both"
-	W.ns.db.avoidPoses = false
-	kneels = 0
-	for _ = 1, 300 do
-		if W.ns.Pick(1)[1] == "KNEEL" then kneels = kneels + 1 end
-	end
-	assert(kneels > 0, "turned off uses /kneel again")
+	assert(kept, "turned off plays animated emotes again")
 end)
 
 test("class lines: about half of rites use your class's lines, and they can be turned off", function()

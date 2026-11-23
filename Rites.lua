@@ -109,24 +109,31 @@ function ns.ResolveTone()
 end
 
 -- Returns prayer, tone, isNemesis.
--- Emotes that hold your character in a pose until you move.
-ns.POSE_EMOTES = { KNEEL = true }
+-- Emotes that animate your character. WoW refuses them while you move, which
+-- in PvP is most of the time, and /kneel holds you in a pose. With "avoid"
+-- on, a line keeps its words but plays a still emote in their place: one the
+-- line doesn't already say, so it never restates it.
+ns.POSE_EMOTES = {
+	PRAY = { "MOURN", "COMFORT" },
+	KNEEL = { "MOURN", "COMFORT" },
+	BOW = { "MOURN", "COMFORT" },
+	SALUTE = { "MOURN", "COMFORT" },
+	CRY = { "MOURN", "SIGH" },
+}
+local STILL_VERBS = { MOURN = "mourn", COMFORT = "comfort", SIGH = "sigh" }
 
-local filtered = {}
-
--- The pool, minus pose emotes when those are avoided (and the emote plays).
-local function poolFor(key, pool)
-	if not ns.db.avoidPoses or ns.db.mode == "custom" then
-		return key, pool
+-- The emote to play for a line, given the settings.
+function ns.EmoteFor(prayer)
+	local token = prayer[1]
+	local still = ns.POSE_EMOTES[token]
+	if not still or not ns.db.avoidPoses then return token end
+	local text = prayer[2]:lower()
+	local options = {}
+	for _, s in ipairs(still) do
+		if not text:find(STILL_VERBS[s], 1, true) then options[#options + 1] = s end
 	end
-	if not filtered[key] then
-		local list = {}
-		for _, prayer in ipairs(pool) do
-			if not ns.POSE_EMOTES[prayer[1]] then list[#list + 1] = prayer end
-		end
-		filtered[key] = #list > 0 and list or pool
-	end
-	return key .. "-noposes", filtered[key]
+	if #options == 0 then options = { "SIGH" } end
+	return options[math.random(#options)]
 end
 
 local CLASS_SHARE = 0.5 -- With class lines on, this share of rites uses them.
@@ -141,14 +148,14 @@ function ns.Pick(killCount)
 	local prayers = ns.Prayers
 	local tone = ns.ResolveTone()
 	if ns.db.nemesisEnabled and killCount >= ns.db.nemesis then
-		return draw(poolFor("nemesis-" .. tone, prayers.nemesis[tone])), tone, true
+		return draw("nemesis-" .. tone, prayers.nemesis[tone]), tone, true
 	end
 	local class = playerClass()
 	local classPool = ns.db.classLines and class and ns.ClassPrayers[class] and ns.ClassPrayers[class][tone]
 	if classPool and #classPool > 0 and math.random() < CLASS_SHARE then
-		return draw(poolFor(class .. "-" .. tone, classPool)), tone, false
+		return draw(class .. "-" .. tone, classPool), tone, false
 	end
-	return draw(poolFor(tone, prayers[tone])), tone, false
+	return draw(tone, prayers[tone]), tone, false
 end
 
 function ns.Fill(template, ctx)
@@ -384,7 +391,7 @@ end
 -- this call already runs inside a keypress or click (slash command, button),
 -- so the prayer can go out right away.
 function ns.Perform(prayer, ctx, fromKeypress)
-	local token, text = prayer[1], ns.Fill(prayer[2], ctx)
+	local token, text = ns.EmoteFor(prayer), ns.Fill(prayer[2], ctx)
 	local mode = ns.db.mode
 	if mode ~= "custom" then
 		-- Aim at the corpse only while it's still targeted, never at someone else.
@@ -450,7 +457,7 @@ function ns.Preview(name, kills)
 	local prayer, tone, nemesis = ns.Pick(count)
 	local me = UnitName("player") or "You"
 	local tag = tone .. (nemesis and ", nemesis" or "")
-	ns.Print(("|cff888888[/%s, %s]|r %s %s"):format(prayer[1]:lower(), tag, me, ns.Fill(prayer[2], ctx)))
+	ns.Print(("|cff888888[/%s, %s]|r %s %s"):format(ns.EmoteFor(prayer):lower(), tag, me, ns.Fill(prayer[2], ctx)))
 end
 
 -- Performs a real rite, ignoring cooldown, chance and zone settings.

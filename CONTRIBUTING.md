@@ -15,7 +15,7 @@ Each prayer in [Prayers.lua](Prayers.lua) and the class files in [Classes/](Clas
 
 - **The emote** is a built-in emote token the enemy faction will see: `PRAY`, `KNEEL`, `BOW`, `SALUTE`, `MOURN`, `PITY`, `VIOLIN`, `GLOAT`, `COMFORT`, `SIGH`, `CRY` or `SHRUG`. Pick one that matches the line.
 - **The line** follows your character's name, so it starts with a lowercase verb: `lays a hand on {name}'s brow...`
-- **Follow on from the emote, don't restate it.** Your faction sees both, so a `/kneel` line can't start with "kneels". Use `/kneel` sparingly: it's skipped by default because it holds your character in a pose.
+- **Follow on from the emote, don't restate it.** Your faction sees both, so a `/kneel` line can't start with "kneels". `/pray`, `/kneel`, `/bow`, `/salute` and `/cry` animate your character, so by default they're swapped for `/mourn`, `/comfort` or `/sigh`: write those lines so they read well after either.
 - **10 to 20 words as shown in chat.** Forever names carry a surname, so your name and each `{name}` count as two words. Other placeholders count as one.
 - **Placeholders:** `{name}`, `{class}`, `{race}`, `{zone}`, `{spell}`, and in nemesis lines `{count}` and `{nth}` (3rd, 4th...). Every one except `{name}` can fall back to a generic word ("adventurer", "this place", "cold steel"), so the line has to read well either way.
 - **Reverent** lines are sincere, scripture-flavored and light on jokes. **Satirical** lines can be as rude as you like about the victim's play, but nothing about real people, real-world religion, race or anything that'd get the player reported.

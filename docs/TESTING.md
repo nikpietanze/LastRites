@@ -21,8 +21,8 @@ LastRites' logic is covered by the mocked-client tests in `tests/`, but kill eve
 | Check | Expected result |
 |---|---|
 | Built-in emotes | Each emote token works on this client: `/pray`, `/kneel`, `/bow`, `/salute`, `/mourn`, `/pity`, `/violin`, `/gloat`, `/comfort`, `/sigh`, `/cry`, `/shrug`. |
-| Test | Target a player and `/rites test`. Your character plays the emote at them ("Aldric kneels before Bob."), and the prayer appears as an emote right after. |
-| No target | `/rites test Bob` with nothing targeted plays the emote with no target ("Aldric kneels."), not at anyone else. |
+| Test | Target a player and `/rites test`. Your character plays the emote at them ("Aldric mourns the death of Bob." or similar), and the prayer appears as an emote right after. |
+| No target | `/rites test Bob` with nothing targeted plays the emote with no target ("Aldric mourns."), not at anyone else. |
 | Modes | Emote only plays just the emote. Prayer only sends just the `/e` line, right away. |
 
 ## Kills
@@ -31,6 +31,7 @@ LastRites' logic is covered by the mocked-client tests in `tests/`, but kill eve
 |---|---|
 | Detection | Land a killing blow on an enemy player. Debug prints `PARTY_KILL` with your GUID, `Your kill`, the emote, then `Prayer waits for your next keypress`. Your next key press sends the prayer. |
 | No key press | After a kill, press nothing for 2 seconds. Debug says the prayer was dropped, and it never appears later. |
+| Avoid emotes that move your character | On (default): kills only ever play still emotes (`/mourn`, `/comfort`, `/sigh`, `/pity`, `/gloat`, `/violin`, `/shrug`). Off: `/pray`, `/bow` and the rest appear, and fail while moving. |
 | Moving | Kill while running. Debug says `while moving`, then retries on your next key press or when you stop, until `Emote showed`. The emote never shows twice, aims at the victim even if you've retargeted, and the prayer comes after it. |
 | Corpse target | When the corpse is still targeted, the emote names the victim. |
 | Others' kills | A kill by a teammate prints `PARTY_KILL` in debug but performs nothing. |
@@ -45,7 +46,7 @@ LastRites' logic is covered by the mocked-client tests in `tests/`, but kill eve
 
 | Check | Expected result |
 |---|---|
-| Built-in emote | The victim sees "Aldric kneels before you." (or similar) while standing at their corpse. |
+| Built-in emote | The victim sees your emote aimed at them while standing at their corpse. |
 | Prayer | The enemy faction sees "Aldric makes some strange gestures." Your faction sees the full line. |
 
 ## Chat lockdown

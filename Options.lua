@@ -96,8 +96,8 @@ ns.OnLoad(function()
 	checkbox("classLines", "Class-themed lines",
 		"Mix in lines written for your class: paladins invoke the Light, warlocks offer the soul to a demon, rogues check the corpse's pockets. About half of all rites.",
 		enabled, "enabled")
-	checkbox("avoidPoses", "Avoid emotes that pose your character",
-		"Skip rites that use /kneel, which holds your character in a kneeling pose until you move. Other emotes play once and let you get on with the fight.",
+	checkbox("avoidPoses", "Avoid emotes that move your character",
+		"Play a still emote like /mourn or /comfort in place of /pray, /kneel, /bow, /salute and /cry. WoW refuses those while you're moving, which in PvP is most kills, and /kneel holds you in a pose. The prayer's words stay the same.",
 		enabled, "enabled")
 
 	header("Where")
