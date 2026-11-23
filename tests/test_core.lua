@@ -410,7 +410,7 @@ test("debug explains every reason a kill gets no rite", function()
 	W.ns.db.enabled = true
 	kill(W)
 	local out = table.concat(W.printed, "\n")
-	assert(out:find("Your kill: Bob") and out:find("Emote /%\a+ at none: sent") and out:find("Sending prayer"), out)
+	assert(out:find("Your kill: Bob") and out:find("Emote /%a+ at none: sent") and out:find("Sending prayer"), out)
 end)
 
 test("unknown command prints help", function()
