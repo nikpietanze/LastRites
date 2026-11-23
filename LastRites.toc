@@ -1,7 +1,7 @@
 ## Interface: 16001
 ## Title: Last Rites
 ## Notes: Kneel, pray or play the world's smallest violin over the players you kill in PvP. Emote only, reverent or satirical.
-## Author: Nik Pietanze
+## Author: Last Rites contributors
 ## Version: @project-version@
 ## IconTexture: Interface\Icons\Spell_Holy_Resurrection
 ## Category: PvP
