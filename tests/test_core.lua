@@ -365,7 +365,7 @@ end)
 test("avoid poses plays a still emote for animated ones (on by default), keeping the line", function()
 	local W = fresh()
 	eq(W.ns.db.avoidPoses, true, "default")
-	local animated = { PRAY = true, KNEEL = true, BOW = true, SALUTE = true, CRY = true }
+	local animated = { PRAY = true, KNEEL = true, BOW = true, SALUTE = true }
 	local drewAnimated = false
 	W.target = { name = "Bob", guid = "Player-9-BOB" }
 	for i = 1, 300 do
@@ -373,7 +373,7 @@ test("avoid poses plays a still emote for animated ones (on by default), keeping
 		if animated[p[1]] then drewAnimated = true end
 		local token = W.ns.EmoteFor(p)
 		assert(not animated[token], "played /" .. token:lower())
-		local verbs = { MOURN = "mourn", COMFORT = "comfort", SIGH = "sigh" }
+		local verbs = { MOURN = "mourn", COMFORT = "comfort", SIGH = "sigh" } -- SIGH: fallback
 		if token ~= p[1] then
 			assert(not p[2]:lower():find(verbs[token], 1, true), "restates /" .. token:lower() .. ": " .. p[2])
 		end

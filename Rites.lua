@@ -118,9 +118,8 @@ ns.POSE_EMOTES = {
 	KNEEL = { "MOURN", "COMFORT" },
 	BOW = { "MOURN", "COMFORT" },
 	SALUTE = { "MOURN", "COMFORT" },
-	CRY = { "MOURN", "SIGH" },
 }
-local STILL_VERBS = { MOURN = "mourn", COMFORT = "comfort", SIGH = "sigh" }
+local STILL_VERBS = { MOURN = "mourn", COMFORT = "comfort" }
 
 -- The emote to play for a line, given the settings.
 function ns.EmoteFor(prayer)
