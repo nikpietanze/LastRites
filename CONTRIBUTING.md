@@ -11,7 +11,7 @@ Thanks for helping out. A few ground rules keep LastRites small and keep people 
 
 ## Writing prayers
 
-Each prayer in [Prayers.lua](Prayers.lua) is `{ "EMOTE", "line" }`.
+Each prayer in [Prayers.lua](Prayers.lua) and the class files in [Classes/](Classes) is `{ "EMOTE", "line" }`. Class lines are themed on the player's own class; `{class}` in them is still the victim's class.
 
 - **The emote** is a built-in emote token the enemy faction will see: `PRAY`, `KNEEL`, `BOW`, `SALUTE`, `MOURN`, `PITY`, `VIOLIN`, `GLOAT`, `COMFORT`, `SIGH`, `CRY` or `SHRUG`. Pick one that matches the line.
 - **The line** follows your character's name, so it starts with a lowercase verb: `kneels beside {name}...`

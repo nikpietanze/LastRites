@@ -23,6 +23,7 @@ Aldric kneels beside Grimgor. "Blessed are the repair bills, for they shall be m
 - **Emote only.** No `/say`, no `/yell`, no chat spam. Every rite is a built-in emote at the corpse plus one `/e` line.
 - **The other faction sees it.** Built-in emotes like `/kneel`, `/pray` and `/violin` cross factions, so your victim sees "Aldric kneels before you." Your faction reads the full prayer. The enemy sees "Aldric makes some strange gestures," which somehow makes it better.
 - **Two tones.** 100 reverent prayers in the King James style, 100 satirical eulogies, or a coin flip between them.
+- **Written for your class.** 100 more lines for each of the nine classes, mixed into about half your rites. Paladins invoke the Light, warlocks shard the soul, rogues check the pockets, hunters let the pet sniff the corpse.
 - **Short.** Every line is 10 to 20 words, so people actually read it mid-fight.
 - **Personal.** Lines can name the victim's class, race, the zone and the spell that killed them.
 - **Nemesis lines.** Kill the same player three times and the rites start keeping count: "Aldric holds Grimgor's 5th funeral. The mourners have stopped bringing casseroles."
@@ -33,7 +34,7 @@ Everything is under **Esc → Options → AddOns → Last Rites** (or type `/rit
 
 | Section | Settings |
 |---|---|
-| Rites | Perform last rites (master switch), tone (mixed, reverent or satirical), what to perform (emote and prayer, emote only, or prayer only), avoid emotes that pose your character (skips `/kneel`, on by default) |
+| Rites | Perform last rites (master switch), tone (mixed, reverent or satirical), what to perform (emote and prayer, emote only, or prayer only), class-themed lines, avoid emotes that pose your character (skips `/kneel`, on by default) |
 | Where | Battlegrounds, arenas, world PvP |
 | Timing | Chance per kill, cooldown between rites |
 | Nemesis | Nemesis lines, kills to become a nemesis |
@@ -73,7 +74,7 @@ You can also clone this repo into that folder as `LastRites`. Target client: WoW
 
 ## Writing prayers
 
-Prayers live in [Prayers.lua](Prayers.lua). Each one pairs a built-in emote with a line that follows your character's name, and must be 10 to 20 words including that name. See [CONTRIBUTING.md](CONTRIBUTING.md) for the placeholders and rules, or suggest one with the prayer issue template.
+Prayers live in [Prayers.lua](Prayers.lua), and class lines in [Classes/](Classes). Each one pairs a built-in emote with a line that follows your character's name, and must be 10 to 20 words including that name. See [CONTRIBUTING.md](CONTRIBUTING.md) for the placeholders and rules, or suggest one with the prayer issue template.
 
 ## Tests
 

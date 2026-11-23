@@ -354,10 +354,11 @@ test("tone reverent only draws reverent lines", function()
 	W.ns.db.tone = "reverent"
 	local set = {}
 	for _, p in ipairs(W.ns.Prayers.reverent) do set[p] = true end
+	for _, p in ipairs(W.ns.ClassPrayers.ROGUE.reverent) do set[p] = true end
 	for _ = 1, 200 do
 		local p, tone = W.ns.Pick(1)
 		eq(tone, "reverent")
-		assert(set[p], "not from the reverent pool")
+		assert(set[p], "not from the reverent pools (general or rogue)")
 	end
 end)
 
@@ -452,6 +453,7 @@ test("shuffle bag doesn't repeat a line until the pool is used up", function()
 	local W = fresh()
 	W.ns.db.tone = "satire"
 	W.ns.db.avoidPoses = false
+	W.ns.db.classLines = false
 	local pool = W.ns.Prayers.satire
 	local seen = {}
 	for _ = 1, #pool do

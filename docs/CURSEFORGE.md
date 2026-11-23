@@ -10,6 +10,7 @@ Aldric kneels beside Grimgor. "Blessed are the repair bills, for they shall be m
 - **Emote only.** A built-in emote at the corpse plus one `/e` line. No `/say`, no `/yell`, no chat spam.
 - **Your victim sees it.** Built-in emotes cross factions, so they get "Aldric kneels before you." Your side reads the full prayer.
 - **Reverent or satirical.** 100 of each, or a coin flip between them. Every line is 10 to 20 words.
+- **Written for your class.** 100 more lines for every class: paladins invoke the Light, warlocks shard the soul, rogues check the pockets.
 - **Personal.** Lines can name the victim's class, race, the zone and the spell that killed them.
 - **Nemesis lines.** Kill the same player three times and the rites start counting funerals.
 - **Toggle anything.** Battlegrounds, arenas and world PvP each on or off, plus chance per kill, cooldown and what to perform.
