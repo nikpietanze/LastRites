@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1
+
+- `/rites last` shows what happened on your last kill (why a prayer didn't go out, say), even with debug off.
+
 ## 1.0.0
 
 First release.

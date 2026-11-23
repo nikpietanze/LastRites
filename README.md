@@ -59,6 +59,7 @@ WoW Forever restricts chat for addons at certain times. A kill during one of tho
 | `/rites test [name]` | Perform a real rite on your target (or a name), ignoring cooldown, chance and zone |
 | `/rites stats` | Your ten most-killed players on this character |
 | `/rites status` | Print client, settings and lockdown details for bug reports |
+| `/rites last` | Show what happened on your last kill, even with debug off |
 | `/rites debug` | Print every kill event LastRites sees, to check detection |
 | `/rites keytest` | For 15 seconds, list each kind of key press, ability and movement Last Rites can see |
 

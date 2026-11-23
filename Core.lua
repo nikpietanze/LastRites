@@ -33,9 +33,32 @@ function ns.Print(message)
 	print("|cff" .. ns.COLOR .. "Last Rites|r " .. tostring(message))
 end
 
+-- Debug lines are kept even with debug off, so /rites last can show what
+-- happened on your last kill after the fact.
+local trail, TRAIL_SIZE = {}, 60
+
 function ns.Debug(message)
+	message = tostring(message)
+	trail[#trail + 1] = { time = date and date("%H:%M:%S") or "", text = message }
+	if #trail > TRAIL_SIZE then table.remove(trail, 1) end
 	if ns.db and ns.db.debug then
-		ns.Print("|cff888888" .. tostring(message) .. "|r")
+		ns.Print("|cff888888" .. message .. "|r")
+	end
+end
+
+-- What happened from your most recent kill on.
+function ns.PrintLast()
+	local from
+	for i = #trail, 1, -1 do
+		if trail[i].text:find("^Your kill") then from = i break end
+	end
+	if not from then
+		ns.Print("No kill of yours since you logged in or reloaded.")
+		return
+	end
+	ns.Print("Your last kill:")
+	for i = from, #trail do
+		print(("  %s %s"):format(trail[i].time, trail[i].text))
 	end
 end
 
@@ -156,6 +179,7 @@ local commands = {
 	stats = printStats,
 	keytest = function() ns.KeyTest() end,
 	status = printStatus,
+	last = function() ns.PrintLast() end,
 	debug = function()
 		ns.db.debug = not ns.db.debug
 		ns.Print("Debug " .. (ns.db.debug and "on: kill events will be printed." or "off."))
@@ -174,6 +198,6 @@ SlashCmdList.LASTRITES = function(input)
 	elseif commands[command] then
 		commands[command](args)
 	else
-		ns.Print("Commands: /rites [options | on | off | preview [name] [kills] | test [name] | stats | keytest | status | debug]")
+		ns.Print("Commands: /rites [options | on | off | preview [name] [kills] | test [name] | stats | last | keytest | status | debug]")
 	end
 end
