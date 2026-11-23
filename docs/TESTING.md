@@ -37,7 +37,7 @@ LastRites' logic is covered by the mocked-client tests in `tests/`, but kill eve
 | Cooldown | A second kill within 20 seconds performs nothing, but `/rites stats` counts it. |
 | Zones | Each of Battlegrounds, Arenas and World PvP turns rites off in that kind of zone. |
 | Nemesis | The third kill of the same player uses a nemesis line with the right count. |
-| Dead | Trading kills (you die at the same moment) performs nothing. Dying right after a kill still sends the prayer, or holds it until chat is allowed again. |
+| Dead | Trading kills (you die at the same moment) performs nothing. Dying during the pause still sends the prayer unless chat locked down, in which case debug says it was dropped. |
 
 ## Visibility (needs someone on the other faction)
 
@@ -50,7 +50,7 @@ LastRites' logic is covered by the mocked-client tests in `tests/`, but kill eve
 
 | Check | Expected result |
 |---|---|
-| Lockdown | If `/rites status` ever shows `chatLockdown=true`, a kill during it performs nothing right away, and the rite plays within a second of the lockdown ending (or expires after 30 seconds). No `ADDON_ACTION_BLOCKED` or `ADDON_ACTION_FORBIDDEN` errors. |
+| Lockdown | If `/rites status` ever shows `chatLockdown=true`, a kill during it gets no rite and debug says why; the rite never shows up later. No `ADDON_ACTION_BLOCKED` or `ADDON_ACTION_FORBIDDEN` errors. |
 
 ## Needs confirming on a live client
 

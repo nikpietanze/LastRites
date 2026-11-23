@@ -46,7 +46,7 @@ Kills are counted even when a rite is skipped by the cooldown, the chance settin
 
 LastRites listens for the client's `PARTY_KILL` event and only reacts when you're the killer and the victim is a player. The killing spell is your last harmful spell cast within a few seconds; melee kills get "cold steel."
 
-WoW Forever restricts chat for addons at certain times. If a rite lands during one of those lockdowns, it waits and plays when the lockdown lifts, or quietly expires after 30 seconds. LastRites never makes protected calls and never sends anything but emotes.
+WoW Forever restricts chat for addons at certain times. A kill during one of those lockdowns gets no rite, since a funeral that shows up later has missed its moment. Kills still count toward nemesis lines. LastRites never makes protected calls and never sends anything but emotes.
 
 ## Commands
 

@@ -3,11 +3,11 @@
 -- Forever's client is Midnight-derived: the combat log is restricted for
 -- addons, so kills come from the standalone PARTY_KILL event and the killing
 -- spell from the player's own successful casts. Chat can be locked down by the
--- client; rites that land during a lockdown wait for it to lift.
+-- client; a rite is only worth it in the moment, so a kill during a lockdown
+-- gets no rite, and a prayer blocked during the pause is dropped.
 local _, ns = ...
 
 local SPELL_WINDOW = 6 -- A cast this recent counts as the killing spell.
-local PENDING_TTL = 30 -- A rite held back by chat lockdown expires after this.
 
 local FALLBACK = {
 	class = "adventurer",
@@ -22,7 +22,6 @@ ns.IsSecret = isSecret
 local playerGUID
 local lastFire = -math.huge
 local lastCast -- { name = spell name, time = GetTime() }
-local pending -- { prayer, ctx, time }
 local bags = {} -- Shuffle bags: no line repeats until its pool runs out.
 
 local function now()
@@ -73,10 +72,6 @@ end
 
 function ns.InChatLockdown()
 	return C_ChatInfo and C_ChatInfo.InChatMessagingLockdown and C_ChatInfo.InChatMessagingLockdown() or false
-end
-
-function ns.HasPendingRite()
-	return pending ~= nil
 end
 
 ----------------------------------------------------------------------
@@ -165,57 +160,32 @@ local function corpseTargeted(name)
 	return UnitExists("target") and not UnitIsUnit("target", "player") and stripRealm(UnitName("target")) == name
 end
 
-local function hold(prayer, ctx, prayerOnly, reason)
-	pending = { prayer = prayer, ctx = ctx, time = now(), prayerOnly = prayerOnly }
-	ns.Debug(reason)
-end
-
-local function sendPrayer(prayer, ctx, text)
+local function sendPrayer(text)
 	if ns.InChatLockdown() then
-		hold(prayer, ctx, true, "Chat locked down before the prayer; it will follow when it lifts.")
+		ns.Debug("Chat locked down during the pause; prayer dropped.")
 		return
 	end
 	ns.Debug("Sending prayer.")
 	sendEmote(text)
 end
 
--- prayerOnly: the built-in emote already played; only the prayer is left.
-local function deliver(prayer, ctx, prayerOnly)
+-- Plays the built-in emote, then the prayer after the pause.
+function ns.Perform(prayer, ctx)
 	local token, text = prayer[1], ns.Fill(prayer[2], ctx)
 	local mode = ns.db.mode
-	if mode ~= "custom" and not prayerOnly then
+	if mode ~= "custom" then
 		-- Aim at the corpse only while it's still targeted, never at someone else.
 		performEmote(token, corpseTargeted(ctx.name) and "target" or "none")
 	end
 	if mode ~= "builtin" then
-		local delay = (mode == "both" and not prayerOnly) and ns.db.delay or 0
+		local delay = mode == "both" and ns.db.delay or 0
 		if delay > 0 then
-			C_Timer.After(delay, function() sendPrayer(prayer, ctx, text) end)
+			C_Timer.After(delay, function() sendPrayer(text) end)
 		else
-			sendPrayer(prayer, ctx, text)
+			sendPrayer(text)
 		end
 	end
 	return text
-end
-
--- Performs now, or holds the rite until chat lockdown lifts.
-function ns.Perform(prayer, ctx)
-	if ns.InChatLockdown() then
-		hold(prayer, ctx, false, "Chat is locked down; the rite will follow when it lifts.")
-		return nil
-	end
-	return deliver(prayer, ctx, false)
-end
-
-function ns.FlushPending()
-	if not pending or ns.InChatLockdown() then return end
-	local rite = pending
-	pending = nil
-	if now() - rite.time > PENDING_TTL then
-		ns.Debug("Held rite expired.")
-		return
-	end
-	deliver(rite.prayer, rite.ctx, rite.prayerOnly)
 end
 
 function ns.OnKill(guid, rawName)
@@ -232,6 +202,10 @@ function ns.OnKill(guid, rawName)
 		return
 	end
 	if UnitIsDeadOrGhost("player") then return end
+	if ns.InChatLockdown() then
+		ns.Debug("Chat is locked down; no rite this time.")
+		return
+	end
 	local t = now()
 	if t - lastFire < db.cooldown then
 		ns.Debug("On cooldown.")
@@ -270,6 +244,10 @@ function ns.TestRite(name)
 	end
 	if not name then
 		ns.Print("Target a player or give a name: /rites test Name")
+		return
+	end
+	if ns.InChatLockdown() then
+		ns.Print("WoW has chat locked for addons right now. Try again in a moment.")
 		return
 	end
 	local count = (ns.db.kills[name] or 0) + 1
@@ -321,18 +299,12 @@ ns.OnLogin(function()
 	local frame = CreateFrame("Frame")
 	frame:RegisterEvent("PARTY_KILL")
 	frame:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player")
-	frame:RegisterEvent("ADDON_RESTRICTION_STATE_CHANGED")
-	frame:RegisterEvent("PLAYER_REGEN_ENABLED")
 	frame:SetScript("OnEvent", function(_, event, ...)
 		if event == "PARTY_KILL" then
 			ns.OnPartyKill(...)
 		elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
 			local _, _, spellID = ...
 			ns.OnSpellCast(spellID)
-		elseif pending then
-			-- Restrictions report inactive during this event's dispatch, so check
-			-- again a moment later.
-			C_Timer.After(0.5, ns.FlushPending)
 		end
 	end)
 end)

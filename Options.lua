@@ -107,7 +107,7 @@ ns.OnLoad(function()
 	slider("cooldown", "Cooldown", 0, 120, 5, "%ds",
 		"The shortest time between two rites. Kills during the cooldown are still counted.", enabled, "enabled")
 	slider("delay", "Pause before the prayer", 0, 5, 0.5, "%.1fs",
-		"Wait this long after the built-in emote before the prayer. Only used with Emote and prayer. A longer pause reads nicely but in a busy fight the prayer can be held until chat is allowed again.",
+		"Wait this long after the built-in emote before the prayer. Only used with Emote and prayer. If chat locks down for addons during the pause, the prayer is skipped.",
 		enabled, "enabled")
 
 	header("Nemesis")

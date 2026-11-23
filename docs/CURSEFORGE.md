@@ -26,7 +26,7 @@ Aldric kneels beside Grimgor. "Blessed are the repair bills, for they shall be m
 
 ## Good to know
 
-- If WoW has chat locked for addons when you land a kill, the rite waits until it lifts.
+- If WoW has chat locked for addons when you land a kill, that kill gets no rite. No late funerals.
 - Kills count even when a rite is skipped, so nemesis counts stay honest.
 
 ## Bugs and ideas

@@ -193,44 +193,50 @@ test("a pause delays the prayer", function()
 	eq(#W.chat, 1, "prayer after the pause")
 end)
 
-test("chat lockdown holds the rite until it lifts", function()
+test("a kill during chat lockdown gets no rite, now or later", function()
 	local W = fresh()
+	W.slash("debug")
 	W.lockdown = true
 	kill(W)
-	eq(#W.emotes, 0, "nothing during lockdown")
-	assert(W.ns.HasPendingRite(), "rite held")
+	eq(#W.emotes + #W.chat, 0, "nothing during lockdown")
+	assert(table.concat(W.printed, "\n"):find("no rite this time"), "debug explains")
 	W.lockdown = false
 	W.fire("ADDON_RESTRICTION_STATE_CHANGED", 1, 0)
-	W.advance(0.5)
-	eq(#W.emotes, 1, "emote after lockdown")
-	eq(#W.chat, 1, "prayer after lockdown")
-	assert(not W.ns.HasPendingRite())
-end)
-
-test("a held rite expires if lockdown lasts too long", function()
-	local W = fresh()
-	W.lockdown = true
-	kill(W)
+	W.fire("PLAYER_REGEN_ENABLED")
 	W.advance(60)
-	W.lockdown = false
-	W.fire("PLAYER_REGEN_ENABLED")
-	W.advance(1)
-	eq(#W.emotes, 0)
+	eq(#W.emotes + #W.chat, 0, "nothing shows up later")
+	eq(W.ns.db.kills.Bob, 1, "kill still counted")
 end)
 
-test("prayer is held, not lost, if lockdown starts during the pause", function()
+test("a lockdown skip doesn't use up the cooldown", function()
 	local W = fresh()
-	W.ns.db.delay = 1.5
+	W.lockdown = true
+	kill(W)
+	W.lockdown = false
+	W.advance(1)
+	kill(W)
+	eq(#W.emotes, 1)
+end)
+
+test("prayer is dropped if lockdown starts during the pause", function()
+	local W = fresh()
+	W.ns.db.delay = 0.5
 	kill(W)
 	W.lockdown = true
-	W.advance(2)
-	eq(#W.emotes, 1); eq(#W.chat, 0)
-	assert(W.ns.HasPendingRite(), "prayer held")
+	W.advance(1)
 	W.lockdown = false
-	W.fire("PLAYER_REGEN_ENABLED")
-	W.advance(0.5)
-	eq(#W.emotes, 1, "emote not repeated")
-	eq(#W.chat, 1, "prayer sent after lockdown")
+	W.advance(60)
+	eq(#W.emotes, 1, "emote played")
+	eq(#W.chat, 0, "prayer dropped, never sent late")
+end)
+
+test("/rites test during lockdown explains instead of performing", function()
+	local W = fresh()
+	W.target = { name = "Bob", guid = "Player-9-BOB" }
+	W.lockdown = true
+	W.slash("test")
+	eq(#W.emotes + #W.chat, 0)
+	assert(W.printed[#W.printed]:find("locked"), W.printed[#W.printed])
 end)
 
 test("saved 1.5s pause from before version 2 becomes 0; a chosen pause is kept", function()

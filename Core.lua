@@ -99,8 +99,8 @@ local function printStatus()
 	print(("  %s | tone=%s mode=%s | bg=%s arena=%s world=%s | chance=%d%% cooldown=%ds delay=%.1fs | nemesis=%s at %d"):format(
 		d.enabled and "on" or "off", d.tone, d.mode, tostring(d.battlegrounds), tostring(d.arenas),
 		tostring(d.world), d.chance, d.cooldown, d.delay, tostring(d.nemesisEnabled), d.nemesis))
-	print(("  zone=%s allowed=%s chatLockdown=%s pending=%s debug=%s"):format(ns.ZoneType(),
-		tostring(ns.ZoneAllowed()), tostring(ns.InChatLockdown()), tostring(ns.HasPendingRite()), tostring(d.debug)))
+	print(("  zone=%s allowed=%s chatLockdown=%s debug=%s"):format(ns.ZoneType(),
+		tostring(ns.ZoneAllowed()), tostring(ns.InChatLockdown()), tostring(d.debug)))
 end
 
 local function printStats()
