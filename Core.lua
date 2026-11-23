@@ -1,4 +1,4 @@
--- LastRites: a short funeral emote over the players you kill in PvP.
+-- Last Rites: a short funeral emote over the players you kill in PvP.
 
 local ADDON_NAME, ns = ...
 
@@ -29,7 +29,7 @@ function ns.OnLoad(fn) loadCallbacks[#loadCallbacks + 1] = fn end
 function ns.OnLogin(fn) loginCallbacks[#loginCallbacks + 1] = fn end
 
 function ns.Print(message)
-	print("|cff" .. ns.COLOR .. "LastRites|r " .. tostring(message))
+	print("|cff" .. ns.COLOR .. "Last Rites|r " .. tostring(message))
 end
 
 function ns.Debug(message)
@@ -126,7 +126,7 @@ end
 
 function LastRites_OnCompartmentEnter(_, button)
 	GameTooltip:SetOwner(button, "ANCHOR_LEFT")
-	GameTooltip:SetText("LastRites")
+	GameTooltip:SetText("Last Rites")
 	GameTooltip:AddDoubleLine("Left-click", "Options", 1, 0.82, 0, 1, 1, 1)
 	GameTooltip:AddDoubleLine("Right-click", "Preview a rite", 1, 0.82, 0, 1, 1, 1)
 	GameTooltip:Show()

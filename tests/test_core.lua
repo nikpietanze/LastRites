@@ -323,7 +323,7 @@ end)
 test("/rites opens the options panel", function()
 	local W = fresh()
 	W.slash("")
-	eq(W.openedCategory, "LastRites")
+	eq(W.openedCategory, "Last Rites")
 end)
 
 test("/rites preview prints locally and sends nothing", function()
@@ -385,7 +385,7 @@ test("options panel registers a setting for every option with matching defaults"
 			eq(s.kind, type(default), key .. " type")
 		end
 	end
-	eq(W.registeredCategory and W.registeredCategory.name, "LastRites")
+	eq(W.registeredCategory and W.registeredCategory.name, "Last Rites")
 end)
 
 test("options buttons run without errors", function()
@@ -401,7 +401,7 @@ end)
 test("compartment clicks open options and preview", function()
 	local W = fresh()
 	LastRites_OnCompartmentClick(nil, "LeftButton")
-	eq(W.openedCategory, "LastRites")
+	eq(W.openedCategory, "Last Rites")
 	local before = #W.printed
 	LastRites_OnCompartmentClick(nil, "RightButton")
 	eq(#W.printed, before + 1)

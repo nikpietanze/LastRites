@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="docs/logo/logo.png" alt="LastRites logo" width="160">
+  <img src="docs/logo/logo.png" alt="Last Rites logo" width="160">
 </p>
 
-<h1 align="center">LastRites</h1>
+<h1 align="center">Last Rites</h1>
 
 <p align="center">
   A small World of Warcraft: Forever addon for PvP. When you land a killing blow on an enemy player, your character performs a short funeral over the body. Reverent, satirical, or both.
@@ -28,7 +28,7 @@ Nik kneels beside Grimgor. "Blessed are the repair bills, for they shall be many
 
 ## Settings
 
-Everything is under **Esc → Options → AddOns → LastRites** (or type `/rites`, or click LastRites in the minimap's addons menu):
+Everything is under **Esc → Options → AddOns → Last Rites** (or type `/rites`, or click Last Rites in the minimap's addons menu):
 
 | Section | Settings |
 |---|---|

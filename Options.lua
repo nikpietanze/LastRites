@@ -1,4 +1,4 @@
--- Options under Esc > Options > AddOns > LastRites, built from Blizzard's
+-- Options under Esc > Options > AddOns > Last Rites, built from Blizzard's
 -- native settings controls so it is searchable and has a Defaults button.
 local _, ns = ...
 
@@ -82,7 +82,7 @@ local function button(name, text, onClick, tooltip)
 end
 
 ns.OnLoad(function()
-	category, layout = Settings.RegisterVerticalLayoutCategory("LastRites")
+	category, layout = Settings.RegisterVerticalLayoutCategory("Last Rites")
 	layout = layout or SettingsPanel:GetLayout(category)
 
 	header("Rites")
