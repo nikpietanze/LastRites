@@ -33,7 +33,7 @@ Everything is under **Esc → Options → AddOns → Last Rites** (or type `/rit
 
 | Section | Settings |
 |---|---|
-| Rites | Perform last rites (master switch), tone (mixed, reverent or satirical), what to perform (emote and prayer, emote only, or prayer only) |
+| Rites | Perform last rites (master switch), tone (mixed, reverent or satirical), what to perform (emote and prayer, emote only, or prayer only), avoid emotes that pose your character (skips `/kneel`, on by default) |
 | Where | Battlegrounds, arenas, world PvP |
 | Timing | Chance per kill, cooldown between rites |
 | Nemesis | Nemesis lines, kills to become a nemesis |

@@ -9,6 +9,7 @@ ns.DEFAULTS = {
 	enabled = true,
 	tone = "mixed", -- "reverent" | "satire" | "mixed"
 	mode = "both", -- "both" (emote + prayer) | "builtin" (emote only) | "custom" (prayer only)
+	avoidPoses = true, -- Skip lines whose emote holds you in a pose (/kneel).
 	-- Where
 	battlegrounds = true,
 	arenas = true,

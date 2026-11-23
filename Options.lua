@@ -93,6 +93,9 @@ ns.OnLoad(function()
 	dropdown("mode", "What to perform", MODES,
 		"The built-in emote is what the other faction sees. The prayer is the funny part, for your side.",
 		enabled, "enabled")
+	checkbox("avoidPoses", "Avoid emotes that pose your character",
+		"Skip rites that use /kneel, which holds your character in a kneeling pose until you move. Other emotes play once and let you get on with the fight.",
+		enabled, "enabled")
 
 	header("Where")
 

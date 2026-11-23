@@ -107,13 +107,33 @@ function ns.ResolveTone()
 end
 
 -- Returns prayer, tone, isNemesis.
+-- Emotes that hold your character in a pose until you move.
+ns.POSE_EMOTES = { KNEEL = true }
+
+local filtered = {}
+
+-- The pool, minus pose emotes when those are avoided (and the emote plays).
+local function poolFor(key, pool)
+	if not ns.db.avoidPoses or ns.db.mode == "custom" then
+		return key, pool
+	end
+	if not filtered[key] then
+		local list = {}
+		for _, prayer in ipairs(pool) do
+			if not ns.POSE_EMOTES[prayer[1]] then list[#list + 1] = prayer end
+		end
+		filtered[key] = #list > 0 and list or pool
+	end
+	return key .. "-noposes", filtered[key]
+end
+
 function ns.Pick(killCount)
 	local prayers = ns.Prayers
 	local tone = ns.ResolveTone()
 	if ns.db.nemesisEnabled and killCount >= ns.db.nemesis then
-		return draw("nemesis-" .. tone, prayers.nemesis[tone]), tone, true
+		return draw(poolFor("nemesis-" .. tone, prayers.nemesis[tone])), tone, true
 	end
-	return draw(tone, prayers[tone]), tone, false
+	return draw(poolFor(tone, prayers[tone])), tone, false
 end
 
 function ns.Fill(template, ctx)

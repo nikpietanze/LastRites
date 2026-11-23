@@ -361,6 +361,30 @@ test("tone reverent only draws reverent lines", function()
 	end
 end)
 
+test("avoid poses skips /kneel lines (on by default), unless only the prayer is sent", function()
+	local W = fresh()
+	eq(W.ns.db.avoidPoses, true, "default")
+	for _ = 1, 300 do
+		local p = W.ns.Pick(1)
+		assert(p[1] ~= "KNEEL", "drew a /kneel line")
+		p = W.ns.Pick(5)
+		assert(p[1] ~= "KNEEL", "drew a /kneel nemesis line")
+	end
+	W.ns.db.mode = "custom"
+	local kneels = 0
+	for _ = 1, 300 do
+		if W.ns.Pick(1)[1] == "KNEEL" then kneels = kneels + 1 end
+	end
+	assert(kneels > 0, "prayer-only mode uses every line")
+	W.ns.db.mode = "both"
+	W.ns.db.avoidPoses = false
+	kneels = 0
+	for _ = 1, 300 do
+		if W.ns.Pick(1)[1] == "KNEEL" then kneels = kneels + 1 end
+	end
+	assert(kneels > 0, "turned off uses /kneel again")
+end)
+
 test("mixed tone draws from both pools", function()
 	local W = fresh()
 	local tones = {}
@@ -397,6 +421,7 @@ end)
 test("shuffle bag doesn't repeat a line until the pool is used up", function()
 	local W = fresh()
 	W.ns.db.tone = "satire"
+	W.ns.db.avoidPoses = false
 	local pool = W.ns.Prayers.satire
 	local seen = {}
 	for _ = 1, #pool do
