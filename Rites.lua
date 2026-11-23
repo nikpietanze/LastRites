@@ -165,21 +165,34 @@ local function corpseTargeted(name)
 	return UnitExists("target") and not UnitIsUnit("target", "player") and stripRealm(UnitName("target")) == name
 end
 
-local function deliver(prayer, ctx)
+local function hold(prayer, ctx, prayerOnly, reason)
+	pending = { prayer = prayer, ctx = ctx, time = now(), prayerOnly = prayerOnly }
+	ns.Debug(reason)
+end
+
+local function sendPrayer(prayer, ctx, text)
+	if ns.InChatLockdown() then
+		hold(prayer, ctx, true, "Chat locked down before the prayer; it will follow when it lifts.")
+		return
+	end
+	ns.Debug("Sending prayer.")
+	sendEmote(text)
+end
+
+-- prayerOnly: the built-in emote already played; only the prayer is left.
+local function deliver(prayer, ctx, prayerOnly)
 	local token, text = prayer[1], ns.Fill(prayer[2], ctx)
 	local mode = ns.db.mode
-	if mode ~= "custom" then
+	if mode ~= "custom" and not prayerOnly then
 		-- Aim at the corpse only while it's still targeted, never at someone else.
 		performEmote(token, corpseTargeted(ctx.name) and "target" or "none")
 	end
 	if mode ~= "builtin" then
-		local delay = mode == "both" and ns.db.delay or 0
+		local delay = (mode == "both" and not prayerOnly) and ns.db.delay or 0
 		if delay > 0 then
-			C_Timer.After(delay, function()
-				if not ns.InChatLockdown() then sendEmote(text) end
-			end)
+			C_Timer.After(delay, function() sendPrayer(prayer, ctx, text) end)
 		else
-			sendEmote(text)
+			sendPrayer(prayer, ctx, text)
 		end
 	end
 	return text
@@ -188,11 +201,10 @@ end
 -- Performs now, or holds the rite until chat lockdown lifts.
 function ns.Perform(prayer, ctx)
 	if ns.InChatLockdown() then
-		pending = { prayer = prayer, ctx = ctx, time = now() }
-		ns.Debug("Chat is locked down; the rite will follow when it lifts.")
+		hold(prayer, ctx, false, "Chat is locked down; the rite will follow when it lifts.")
 		return nil
 	end
-	return deliver(prayer, ctx)
+	return deliver(prayer, ctx, false)
 end
 
 function ns.FlushPending()
@@ -203,7 +215,7 @@ function ns.FlushPending()
 		ns.Debug("Held rite expired.")
 		return
 	end
-	deliver(rite.prayer, rite.ctx)
+	deliver(rite.prayer, rite.ctx, rite.prayerOnly)
 end
 
 function ns.OnKill(guid, rawName)

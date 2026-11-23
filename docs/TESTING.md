@@ -21,7 +21,7 @@ LastRites' logic is covered by the mocked-client tests in `tests/`, but kill eve
 | Check | Expected result |
 |---|---|
 | Built-in emotes | Each emote token works on this client: `/pray`, `/kneel`, `/bow`, `/salute`, `/mourn`, `/pity`, `/violin`, `/gloat`, `/comfort`, `/sigh`, `/cry`, `/shrug`. |
-| Test | Target a player and `/rites test`. Your character plays the emote at them ("Aldric kneels before Bob."), then the prayer appears as an emote 1.5 seconds later. |
+| Test | Target a player and `/rites test`. Your character plays the emote at them ("Aldric kneels before Bob."), and the prayer appears as an emote right after. With **Pause before the prayer** set, the prayer waits that long. |
 | No target | `/rites test Bob` with nothing targeted plays the emote with no target ("Aldric kneels."), not at anyone else. |
 | Modes | Emote only plays just the emote. Prayer only sends just the `/e` line, right away. |
 
@@ -37,7 +37,7 @@ LastRites' logic is covered by the mocked-client tests in `tests/`, but kill eve
 | Cooldown | A second kill within 20 seconds performs nothing, but `/rites stats` counts it. |
 | Zones | Each of Battlegrounds, Arenas and World PvP turns rites off in that kind of zone. |
 | Nemesis | The third kill of the same player uses a nemesis line with the right count. |
-| Dead | Trading kills (you die at the same moment) performs nothing. |
+| Dead | Trading kills (you die at the same moment) performs nothing. Dying right after a kill still sends the prayer, or holds it until chat is allowed again. |
 
 ## Visibility (needs someone on the other faction)
 

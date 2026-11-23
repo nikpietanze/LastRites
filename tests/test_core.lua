@@ -41,15 +41,13 @@ end
 
 print("LastRites core tests")
 
-test("killing an enemy player plays a built-in emote, then the prayer", function()
+test("killing an enemy player plays a built-in emote and the prayer together", function()
 	local W = fresh()
 	W.target = { name = "Bob", guid = "Player-9-BOB" }
 	kill(W)
 	eq(#W.emotes, 1, "emotes")
 	eq(W.emotes[1][2], "target", "aimed at the corpse")
-	eq(#W.chat, 0, "prayer waits for the delay")
-	W.advance(1.5)
-	eq(#W.chat, 1, "prayer after delay")
+	eq(#W.chat, 1, "prayer sent right away by default")
 	eq(W.chat[1][2], "EMOTE")
 	assert(not W.chat[1][1]:find("[{}]"), "unfilled placeholder: " .. W.chat[1][1])
 end)
@@ -185,11 +183,14 @@ test("mode custom sends only the prayer, immediately", function()
 	eq(#W.emotes, 0); eq(#W.chat, 1)
 end)
 
-test("delay 0 sends the prayer right away", function()
+test("a pause delays the prayer", function()
 	local W = fresh()
-	W.ns.db.delay = 0
+	W.ns.db.delay = 1.5
 	kill(W)
-	eq(#W.chat, 1)
+	eq(#W.emotes, 1)
+	eq(#W.chat, 0, "prayer waits")
+	W.advance(1.5)
+	eq(#W.chat, 1, "prayer after the pause")
 end)
 
 test("chat lockdown holds the rite until it lifts", function()
@@ -202,7 +203,6 @@ test("chat lockdown holds the rite until it lifts", function()
 	W.fire("ADDON_RESTRICTION_STATE_CHANGED", 1, 0)
 	W.advance(0.5)
 	eq(#W.emotes, 1, "emote after lockdown")
-	W.advance(1.5)
 	eq(#W.chat, 1, "prayer after lockdown")
 	assert(not W.ns.HasPendingRite())
 end)
@@ -218,12 +218,28 @@ test("a held rite expires if lockdown lasts too long", function()
 	eq(#W.emotes, 0)
 end)
 
-test("prayer is dropped if lockdown starts during the delay", function()
+test("prayer is held, not lost, if lockdown starts during the pause", function()
 	local W = fresh()
+	W.ns.db.delay = 1.5
 	kill(W)
 	W.lockdown = true
 	W.advance(2)
 	eq(#W.emotes, 1); eq(#W.chat, 0)
+	assert(W.ns.HasPendingRite(), "prayer held")
+	W.lockdown = false
+	W.fire("PLAYER_REGEN_ENABLED")
+	W.advance(0.5)
+	eq(#W.emotes, 1, "emote not repeated")
+	eq(#W.chat, 1, "prayer sent after lockdown")
+end)
+
+test("saved 1.5s pause from before version 2 becomes 0; a chosen pause is kept", function()
+	local W = fresh({ version = 1, delay = 1.5 })
+	eq(W.ns.db.delay, 0)
+	local W2 = fresh({ version = 1, delay = 3 })
+	eq(W2.ns.db.delay, 3)
+	local W3 = fresh({ version = 2, delay = 1.5 })
+	eq(W3.ns.db.delay, 1.5)
 end)
 
 test("tone reverent only draws reverent lines", function()
