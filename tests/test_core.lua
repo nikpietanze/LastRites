@@ -242,14 +242,15 @@ test("the key frame never blocks the mouse", function()
 	end
 end)
 
-test("/rites keytest lists presses for 10 seconds", function()
+test("/rites keytest lists each kind of press once for 15 seconds", function()
 	local W = fresh()
 	W.slash("keytest")
 	W.press("W")
+	W.press("A")
 	UseAction(1)
 	assert(W.printed[#W.printed - 1]:find("saw key W"), W.printed[#W.printed - 1])
 	assert(W.printed[#W.printed]:find("saw UseAction"), W.printed[#W.printed])
-	W.advance(11)
+	W.advance(16)
 	local n = #W.printed
 	W.press("W")
 	eq(#W.printed, n, "stops after 10 seconds")

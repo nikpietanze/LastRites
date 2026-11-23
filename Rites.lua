@@ -178,14 +178,20 @@ local function sendPrayer(text)
 end
 
 -- Called on every key press (the keys still reach the game as normal).
-local keyTestUntil, keyTestShown = 0, 0
+local keyTestUntil, keyTestSeen = 0, {}
 
 -- Called on every key press, ability use and movement start (the input still
 -- reaches the game as normal). source says what was seen, for /rites keytest.
 function ns.OnKeyPress(source)
-	if now() < keyTestUntil and keyTestShown < 8 then
-		keyTestShown = keyTestShown + 1
-		ns.Print("Key test: saw " .. tostring(source) .. ".")
+	if now() < keyTestUntil then
+		-- Each kind once (every key counts as one kind), so abilities and
+		-- movement aren't crowded out by a stream of keys.
+		local kind = tostring(source):match("^key ") and "a key" or tostring(source)
+		if not keyTestSeen[kind] then
+			keyTestSeen[kind] = true
+			ns.Print(("Key test: saw %s%s."):format(tostring(source),
+				InCombatLockdown() and " (in combat)" or ""))
+		end
 	end
 	if not queued then return end
 	local t = now()
@@ -198,8 +204,8 @@ function ns.OnKeyPress(source)
 end
 
 function ns.KeyTest()
-	keyTestUntil, keyTestShown = now() + 10, 0
-	ns.Print("Key test: for 10 seconds, every press Last Rites can see is listed. Try keys, abilities, moving and jumping.")
+	keyTestUntil, keyTestSeen = now() + 15, {}
+	ns.Print("Key test: for 15 seconds, each kind of press Last Rites can see is listed once. Try a key, an ability by keybind, an ability by clicking, moving and jumping. Best done while in combat.")
 end
 
 local function queuePrayer(text, delay)
