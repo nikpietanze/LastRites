@@ -21,8 +21,8 @@ LastRites' logic is covered by the mocked-client tests in `tests/`, but kill eve
 | Check | Expected result |
 |---|---|
 | Built-in emotes | Each emote token works on this client: `/pray`, `/kneel`, `/bow`, `/salute`, `/mourn`, `/pity`, `/violin`, `/gloat`, `/comfort`, `/sigh`, `/cry`, `/shrug`. |
-| Test | Target a player and `/rites test`. Your character plays the emote at them ("Nik kneels before Bob."), then the prayer appears as an emote 1.5 seconds later. |
-| No target | `/rites test Bob` with nothing targeted plays the emote with no target ("Nik kneels."), not at anyone else. |
+| Test | Target a player and `/rites test`. Your character plays the emote at them ("Aldric kneels before Bob."), then the prayer appears as an emote 1.5 seconds later. |
+| No target | `/rites test Bob` with nothing targeted plays the emote with no target ("Aldric kneels."), not at anyone else. |
 | Modes | Emote only plays just the emote. Prayer only sends just the `/e` line, right away. |
 
 ## Kills
@@ -43,8 +43,8 @@ LastRites' logic is covered by the mocked-client tests in `tests/`, but kill eve
 
 | Check | Expected result |
 |---|---|
-| Built-in emote | The victim sees "Nik kneels before you." (or similar) while standing at their corpse. |
-| Prayer | The enemy faction sees "Nik makes some strange gestures." Your faction sees the full line. |
+| Built-in emote | The victim sees "Aldric kneels before you." (or similar) while standing at their corpse. |
+| Prayer | The enemy faction sees "Aldric makes some strange gestures." Your faction sees the full line. |
 
 ## Chat lockdown
 

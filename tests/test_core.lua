@@ -331,7 +331,7 @@ test("/rites preview prints locally and sends nothing", function()
 	W.slash("preview Grimgor 5")
 	eq(#W.emotes + #W.chat, 0)
 	local line = W.printed[#W.printed]
-	assert(line:find("Nik") and line:find("nemesis"), "preview line: " .. tostring(line))
+	assert(line:find("Aldric") and line:find("nemesis"), "preview line: " .. tostring(line))
 end)
 
 test("/rites test performs on your target, ignoring cooldown and zone", function()

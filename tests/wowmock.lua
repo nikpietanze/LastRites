@@ -44,7 +44,7 @@ function M.install(root, savedDB)
 		if unit == "target" and W.target then return W.target.guid end
 	end
 	_G.UnitName = function(unit)
-		if unit == "player" then return "Nik" end
+		if unit == "player" then return "Aldric" end
 		if unit == "target" and W.target then return W.target.name end
 	end
 	_G.UnitExists = function(unit) return unit == "player" or (unit == "target" and W.target ~= nil) end

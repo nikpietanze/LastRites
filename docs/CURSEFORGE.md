@@ -1,14 +1,14 @@
 A short funeral emote over every enemy player you kill in PvP, with reverent or satirical prayers your victim can see.
 
 ```
-Nik kneels before Grimgor.
-Nik kneels beside Grimgor. "Blessed are the repair bills, for they shall be many."
+Aldric kneels before Grimgor.
+Aldric kneels beside Grimgor. "Blessed are the repair bills, for they shall be many."
 ```
 
 ## Features
 
 - **Emote only.** A built-in emote at the corpse plus one `/e` line. No `/say`, no `/yell`, no chat spam.
-- **Your victim sees it.** Built-in emotes cross factions, so they get "Nik kneels before you." Your side reads the full prayer.
+- **Your victim sees it.** Built-in emotes cross factions, so they get "Aldric kneels before you." Your side reads the full prayer.
 - **Reverent or satirical.** 100 of each, or a coin flip between them. Every line is 10 to 20 words.
 - **Personal.** Lines can name the victim's class, race, the zone and the spell that killed them.
 - **Nemesis lines.** Kill the same player three times and the rites start counting funerals.

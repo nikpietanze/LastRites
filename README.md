@@ -15,16 +15,16 @@
 </p>
 
 ```
-Nik kneels before Grimgor.
-Nik kneels beside Grimgor. "Blessed are the repair bills, for they shall be many."
+Aldric kneels before Grimgor.
+Aldric kneels beside Grimgor. "Blessed are the repair bills, for they shall be many."
 ```
 
 - **Emote only.** No `/say`, no `/yell`, no chat spam. Every rite is a built-in emote at the corpse plus one `/e` line.
-- **The other faction sees it.** Built-in emotes like `/kneel`, `/pray` and `/violin` cross factions, so your victim sees "Nik kneels before you." Your faction reads the full prayer. The enemy sees "Nik makes some strange gestures," which somehow makes it better.
+- **The other faction sees it.** Built-in emotes like `/kneel`, `/pray` and `/violin` cross factions, so your victim sees "Aldric kneels before you." Your faction reads the full prayer. The enemy sees "Aldric makes some strange gestures," which somehow makes it better.
 - **Two tones.** 100 reverent prayers in the King James style, 100 satirical eulogies, or a coin flip between them.
 - **Short.** Every line is 10 to 20 words, so people actually read it mid-fight.
 - **Personal.** Lines can name the victim's class, race, the zone and the spell that killed them.
-- **Nemesis lines.** Kill the same player three times and the rites start keeping count: "Nik holds Grimgor's 5th funeral. The mourners have stopped bringing casseroles."
+- **Nemesis lines.** Kill the same player three times and the rites start keeping count: "Aldric holds Grimgor's 5th funeral. The mourners have stopped bringing casseroles."
 
 ## Settings
 
