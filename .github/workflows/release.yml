@@ -49,3 +49,5 @@ jobs:
         with:
           name: LastRites-dry-run
           path: .release/*.zip
+          include-hidden-files: true
+          if-no-files-found: error
