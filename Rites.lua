@@ -176,8 +176,8 @@ function ns.Perform(prayer, ctx)
 	if mode ~= "custom" then
 		-- Aim at the corpse only while it's still targeted, never at someone else.
 		local target = corpseTargeted(ctx.name) and "target" or "none"
-		local ok = performEmote(token, target)
-		ns.Debug(("Emote /%s at %s: %s."):format(token:lower(), target, ok == false and "refused by WoW" or "sent"))
+		local result = performEmote(token, target)
+		ns.Debug(("Emote /%s at %s (WoW returned %s)."):format(token:lower(), target, tostring(result)))
 	end
 	if mode ~= "builtin" then
 		local delay = mode == "both" and ns.db.delay or 0
@@ -315,12 +315,17 @@ ns.OnLogin(function()
 	local frame = CreateFrame("Frame")
 	frame:RegisterEvent("PARTY_KILL")
 	frame:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player")
+	frame:RegisterEvent("ADDON_ACTION_BLOCKED")
+	frame:RegisterEvent("ADDON_ACTION_FORBIDDEN")
 	frame:SetScript("OnEvent", function(_, event, ...)
 		if event == "PARTY_KILL" then
 			ns.OnPartyKill(...)
 		elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
 			local _, _, spellID = ...
 			ns.OnSpellCast(spellID)
+		elseif event == "ADDON_ACTION_BLOCKED" or event == "ADDON_ACTION_FORBIDDEN" then
+			local addon, func = ...
+			ns.Debug(("%s: %s tried %s."):format(event, tostring(addon), tostring(func)))
 		end
 	end)
 end)
