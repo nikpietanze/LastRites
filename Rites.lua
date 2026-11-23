@@ -175,7 +175,9 @@ function ns.Perform(prayer, ctx)
 	local mode = ns.db.mode
 	if mode ~= "custom" then
 		-- Aim at the corpse only while it's still targeted, never at someone else.
-		performEmote(token, corpseTargeted(ctx.name) and "target" or "none")
+		local target = corpseTargeted(ctx.name) and "target" or "none"
+		local ok = performEmote(token, target)
+		ns.Debug(("Emote /%s at %s: %s."):format(token:lower(), target, ok == false and "refused by WoW" or "sent"))
 	end
 	if mode ~= "builtin" then
 		local delay = mode == "both" and ns.db.delay or 0
@@ -196,12 +198,18 @@ function ns.OnKill(guid, rawName)
 	local count = db.kills[name]
 	local ctx = ns.BuildContext(name, guid, count)
 
-	if not db.enabled then return end
+	if not db.enabled then
+		ns.Debug("Rites are turned off.")
+		return
+	end
 	if not ns.ZoneAllowed() then
 		ns.Debug("Rites are off for " .. ns.ZoneType() .. ".")
 		return
 	end
-	if UnitIsDeadOrGhost("player") then return end
+	if UnitIsDeadOrGhost("player") then
+		ns.Debug("You're dead; no rite.")
+		return
+	end
 	if ns.InChatLockdown() then
 		ns.Debug("Chat is locked down; no rite this time.")
 		return
@@ -268,13 +276,21 @@ function ns.OnPartyKill(attackerGUID, targetGUID)
 		return
 	end
 	ns.Debug(("PARTY_KILL %s -> %s"):format(tostring(attackerGUID), tostring(targetGUID)))
-	if not playerGUID or attackerGUID ~= playerGUID then return end
-	if type(targetGUID) ~= "string" or not targetGUID:find("^Player%-") then return end
+	playerGUID = playerGUID or UnitGUID("player")
+	if attackerGUID ~= playerGUID then
+		ns.Debug(("Not your kill (you are %s)."):format(tostring(playerGUID)))
+		return
+	end
+	if type(targetGUID) ~= "string" or not targetGUID:find("^Player%-") then
+		ns.Debug("Not a player; no rite.")
+		return
+	end
 	local _, _, _, _, _, name = GetPlayerInfoByGUID(targetGUID)
 	if not name or isSecret(name) then
 		ns.Debug("Couldn't read the victim's name.")
 		return
 	end
+	ns.Debug("Your kill: " .. name .. ".")
 	ns.OnKill(targetGUID, name)
 end
 

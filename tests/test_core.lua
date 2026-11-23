@@ -390,6 +390,29 @@ test("/rites debug logs kill events", function()
 	assert(table.concat(W.printed, "\n"):find("PARTY_KILL"), "debug output")
 end)
 
+test("debug explains every reason a kill gets no rite", function()
+	local W = fresh()
+	W.slash("debug")
+	local function lastDebug() return W.printed[#W.printed] end
+	kill(W, "Player-9-BOB", "Player-1-OTHER")
+	assert(lastDebug():find("Not your kill"), lastDebug())
+	kill(W, "Creature-0-1")
+	assert(lastDebug():find("Not a player"), lastDebug())
+	kill(W, "Player-9-NOBODY")
+	assert(lastDebug():find("Couldn't read"), lastDebug())
+	W.dead = true
+	kill(W)
+	assert(lastDebug():find("dead"), lastDebug())
+	W.dead = false
+	W.ns.db.enabled = false
+	kill(W)
+	assert(lastDebug():find("turned off"), lastDebug())
+	W.ns.db.enabled = true
+	kill(W)
+	local out = table.concat(W.printed, "\n")
+	assert(out:find("Your kill: Bob") and out:find("Emote /%\a+ at none: sent") and out:find("Sending prayer"), out)
+end)
+
 test("unknown command prints help", function()
 	local W = fresh()
 	W.slash("bogus")
