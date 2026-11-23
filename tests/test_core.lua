@@ -570,7 +570,7 @@ test("debug explains every reason a kill gets no rite", function()
 	kill(W)
 	W.press()
 	local out = table.concat(W.printed, "\n")
-	assert(out:find("Your kill: Bob") and out:find("Emote /%a+ at Bob %(WoW returned true%)") and out:find("Sending prayer"), out)
+	assert(out:find("Your kill: Bob") and out:find("Emote /%a+ at Bob %(WoW returned false%)") and out:find("Emote showed") and out:find("Sending prayer"), out)
 end)
 
 test("unknown command prints help", function()
@@ -625,6 +625,59 @@ test("saved settings and kills survive a reload; bad values are repaired", funct
 	eq(W3.ns.db.tone, "mixed")
 	eq(W3.ns.db.mode, "both")
 	eq(W3.ns.db.chance, 100, "missing keys filled")
+end)
+
+test("an emote refused while moving is retried when you stop", function()
+	local W = fresh()
+	W.target = { name = "Bob", guid = "Player-9-BOB" }
+	W.moving = true
+	kill(W)
+	eq(#W.emotes, 1)
+	assert(not W.emotes[1].shown, "refused while moving")
+	W.moving = false
+	W.advance(0.3)
+	W.fire("PLAYER_STOPPED_MOVING")
+	eq(#W.emotes, 2, "retried")
+	assert(W.emotes[2].shown, "shown on retry")
+	W.fire("PLAYER_STOPPED_MOVING")
+	W.press()
+	eq(#W.emotes, 2, "no more retries once it showed")
+	eq(#W.chat, 1, "prayer still sent")
+end)
+
+test("an emote refused while moving is retried on a key press, a few times at most", function()
+	local W = fresh()
+	W.target = { name = "Bob", guid = "Player-9-BOB" }
+	W.moving = true
+	kill(W)
+	W.press()
+	eq(#W.emotes, 1, "no retry straight away")
+	eq(#W.chat, 1, "prayer on the key press")
+	for _ = 1, 4 do W.advance(0.3); W.press() end
+	eq(#W.emotes, 3, "three tries in all")
+	W.moving = false
+	W.fire("PLAYER_STOPPED_MOVING")
+	eq(#W.emotes, 3, "gave up")
+end)
+
+test("no emote retry once the moment has passed", function()
+	local W = fresh()
+	W.moving = true
+	kill(W)
+	W.advance(2)
+	W.moving = false
+	W.fire("PLAYER_STOPPED_MOVING")
+	eq(#W.emotes, 1)
+end)
+
+test("a shown emote is never repeated", function()
+	local W = fresh()
+	W.target = { name = "Bob", guid = "Player-9-BOB" }
+	kill(W)
+	W.advance(0.5)
+	W.press()
+	W.fire("PLAYER_STOPPED_MOVING")
+	eq(#W.emotes, 1)
 end)
 
 print(("%d passed, %d failed"):format(passed, failed))

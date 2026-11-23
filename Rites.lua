@@ -242,6 +242,47 @@ end
 
 local queued -- { text, from, to }: a prayer waiting for a keypress
 
+-- The last built-in emote, until WoW shows it in chat. WoW refuses emotes
+-- while you move and PerformEmote's return value can't be trusted, so a rite
+-- watches for its own emote and tries again (on a key press or when you stop
+-- moving) while the moment lasts.
+local pendingEmote -- { token, target, deadline, tries }
+local EMOTE_TRIES = 3
+
+local function isMoving()
+	return IsPlayerMoving and IsPlayerMoving() and true or false
+end
+
+local function tryEmote(entry, why)
+	entry.tries = entry.tries + 1
+	local result = performEmote(entry.token, entry.target)
+	ns.Debug(("Emote /%s at %s%s%s (WoW returned %s)."):format(entry.token:lower(), entry.target,
+		why and (", " .. why) or "", isMoving() and ", while moving" or "", tostring(result)))
+end
+
+local function retryEmote(why)
+	local entry = pendingEmote
+	if not entry then return end
+	if now() > entry.deadline or entry.tries >= EMOTE_TRIES then
+		pendingEmote = nil
+		ns.Debug("The emote never showed; giving up on it.")
+		return
+	end
+	tryEmote(entry, why)
+end
+
+-- CHAT_MSG_TEXT_EMOTE: our own emote showing in chat means it worked.
+function ns.OnTextEmote(guid)
+	if not pendingEmote then return end
+	if guid ~= nil and not isSecret(guid) and guid ~= (playerGUID or UnitGUID("player")) then return end
+	pendingEmote = nil
+	ns.Debug("Emote showed.")
+end
+
+function ns.OnStoppedMoving()
+	retryEmote("retry after you stopped moving")
+end
+
 local function sendPrayer(text)
 	if ns.InChatLockdown() then
 		ns.Debug("Chat locked down; prayer dropped.")
@@ -266,6 +307,10 @@ function ns.OnKeyPress(source)
 			ns.Print(("Key test: saw %s%s."):format(tostring(source),
 				InCombatLockdown() and " (in combat)" or ""))
 		end
+	end
+	if pendingEmote and now() - pendingEmote.at >= 0.25 then
+		pendingEmote.at = now()
+		retryEmote("retry on key press")
 	end
 	if not queued then return end
 	local t = now()
@@ -307,9 +352,10 @@ function ns.Perform(prayer, ctx, fromKeypress)
 	local mode = ns.db.mode
 	if mode ~= "custom" then
 		-- Aim at the corpse only while it's still targeted, never at someone else.
-		local target = emoteTarget(ctx)
-		local result = performEmote(token, target)
-		ns.Debug(("Emote /%s at %s (WoW returned %s)."):format(token:lower(), target, tostring(result)))
+		local entry = { token = token, target = emoteTarget(ctx), at = now(),
+			deadline = now() + KEY_WINDOW, tries = 0 }
+		pendingEmote = entry
+		tryEmote(entry)
 	end
 	if mode ~= "builtin" then
 		if fromKeypress then
@@ -483,12 +529,18 @@ ns.OnLogin(function()
 	if not setupKeyFrame() then frame:RegisterEvent("PLAYER_REGEN_ENABLED") end
 	hookInputs()
 	frame:RegisterEvent("ADDON_ACTION_FORBIDDEN")
+	frame:RegisterEvent("CHAT_MSG_TEXT_EMOTE")
+	frame:RegisterEvent("PLAYER_STOPPED_MOVING")
 	frame:SetScript("OnEvent", function(_, event, ...)
 		if event == "PARTY_KILL" then
 			ns.OnPartyKill(...)
 		elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
 			local _, _, spellID = ...
 			ns.OnSpellCast(spellID)
+		elseif event == "CHAT_MSG_TEXT_EMOTE" then
+			ns.OnTextEmote((select(12, ...)))
+		elseif event == "PLAYER_STOPPED_MOVING" then
+			ns.OnStoppedMoving()
 		elseif event == "PLAYER_REGEN_ENABLED" then
 			if setupKeyFrame() then frame:UnregisterEvent("PLAYER_REGEN_ENABLED") end
 		elseif event == "ADDON_ACTION_BLOCKED" or event == "ADDON_ACTION_FORBIDDEN" then

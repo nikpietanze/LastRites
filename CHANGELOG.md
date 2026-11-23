@@ -12,6 +12,7 @@ First release.
 - Native options panel: master switch, tone, what to perform (emote and prayer, emote only, prayer only), class-themed lines, avoid emotes that pose your character, battlegrounds, arenas and world PvP toggles, chance per kill, cooldown, nemesis lines and threshold. Preview, Test, Your nemeses and Reset kill counts buttons included.
 - The prayer goes out on your next key press after the kill, since WoW only sends addon emote text during a key press. No key press within 1.5 seconds, no prayer.
 - Prayers follow on from their emote instead of restating it.
+- WoW refuses emotes while you move, so a rite watches for its emote in chat and tries again on a key press or when you stop moving, for up to 1.5 seconds.
 - No late rites: a kill while WoW has chat locked for addons gets no rite, rather than one that shows up after the moment has passed.
 - Addon compartment entry: left-click for options, right-click to preview.
 - `/rites status` and `/rites debug` for bug reports.

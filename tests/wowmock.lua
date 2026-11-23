@@ -25,6 +25,7 @@ function M.install(root, savedDB, beforeLogin)
 		zone = "Warsong Gulch",
 		instance = { false, "none" },
 		dead = false,
+		moving = false, -- WoW refuses emotes while you move
 		combat = false,
 		lockdown = false,
 		players = {}, -- [guid] = { class, race, name }
@@ -70,10 +71,17 @@ function M.install(root, savedDB, beforeLogin)
 		IsSpellHarmful = function(id) return W.harmful[id] == true end,
 	}
 	_G.C_ChatInfo = {
-		PerformEmote = function(token, target) W.emotes[#W.emotes + 1] = { token, target }; return true end,
+		PerformEmote = function(token, target)
+			W.emotes[#W.emotes + 1] = { token, target, shown = not W.moving }
+			if not W.moving then
+				W.fire("CHAT_MSG_TEXT_EMOTE", "You emote.", "Aldric", "", "", "", "", 0, 0, "", 0, 0, UnitGUID("player"))
+			end
+			return false -- like the real client: not to be trusted
+		end,
 		SendChatMessage = function(text, channel) W.chat[#W.chat + 1] = { text, channel } end,
 		InChatMessagingLockdown = function() return W.lockdown end,
 	}
+	_G.IsPlayerMoving = function() return W.moving end
 	_G.C_Timer = { After = function(delay, fn) W.timers[#W.timers + 1] = { at = W.time + delay, fn = fn } end }
 	_G.print = function(...)
 		local parts = {}
