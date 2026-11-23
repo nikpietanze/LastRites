@@ -74,7 +74,11 @@ function M.install(root, savedDB, beforeLogin)
 		PerformEmote = function(token, target)
 			W.emotes[#W.emotes + 1] = { token, target, shown = not W.moving }
 			if not W.moving then
-				W.fire("CHAT_MSG_TEXT_EMOTE", "You emote.", "Aldric", "", "", "", "", 0, 0, "", 0, 0, UnitGUID("player"))
+				local function shown()
+					W.fire("CHAT_MSG_TEXT_EMOTE", "You emote.", "Aldric", "", "", "", "", 0, 0, "", 0, 0, UnitGUID("player"))
+				end
+				-- emoteDelay: the emote reaches chat a moment later, as from a server
+				if W.emoteDelay then C_Timer.After(W.emoteDelay, shown) else shown() end
 			end
 			return false -- like the real client: not to be trusted
 		end,

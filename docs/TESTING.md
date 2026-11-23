@@ -31,7 +31,7 @@ LastRites' logic is covered by the mocked-client tests in `tests/`, but kill eve
 |---|---|
 | Detection | Land a killing blow on an enemy player. Debug prints `PARTY_KILL` with your GUID, `Your kill`, the emote, then `Prayer waits for your next keypress`. Your next key press sends the prayer. |
 | No key press | After a kill, press nothing for 2 seconds. Debug says the prayer was dropped, and it never appears later. |
-| Moving | Kill while running. Debug says `while moving`, then retries on your next key press or when you stop, until `Emote showed`. The emote never shows twice. |
+| Moving | Kill while running. Debug says `while moving`, then retries on your next key press or when you stop, until `Emote showed`. The emote never shows twice, aims at the victim even if you've retargeted, and the prayer comes after it. |
 | Corpse target | When the corpse is still targeted, the emote names the victim. |
 | Others' kills | A kill by a teammate prints `PARTY_KILL` in debug but performs nothing. |
 | NPCs | Killing a creature performs nothing. |

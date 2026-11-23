@@ -9,7 +9,9 @@
 -- WoW only lets addons send /e text during a real keypress or click. The
 -- built-in emote plays right away on the kill; the prayer goes out on your
 -- next keypress, which in PvP is a fraction of a second later. No keypress
--- within KEY_WINDOW and the prayer is dropped, never sent late.
+-- within KEY_WINDOW and the prayer is dropped, never sent late. If WoW refused
+-- the emote (you were moving), the emote is retried and the prayer waits for
+-- it, up to PRAYER_CAP after the kill.
 local _, ns = ...
 
 local SPELL_WINDOW = 6 -- A cast this recent counts as the killing spell.
@@ -240,43 +242,66 @@ local function emoteTarget(ctx)
 	return "none"
 end
 
-local queued -- { text, from, to }: a prayer waiting for a keypress
+local queued -- { text, from, to, cap }: a prayer waiting for a keypress
+local PRAYER_CAP = 3 -- Seconds after the kill a prayer held back for its emote may still go out.
 
 -- The last built-in emote, until WoW shows it in chat. WoW refuses emotes
 -- while you move and PerformEmote's return value can't be trusted, so a rite
 -- watches for its own emote and tries again (on a key press or when you stop
--- moving) while the moment lasts.
-local pendingEmote -- { token, target, deadline, tries }
+-- moving) while the moment lasts. The prayer waits for the emote, so the two
+-- always read in order.
+local pendingEmote -- { token, ctx, deadline, tries, at, moving }
 local EMOTE_TRIES = 3
+local EMOTE_SETTLE = 0.4 -- Seconds a try gets to show in chat before the next one.
 
 local function isMoving()
 	return IsPlayerMoving and IsPlayerMoving() and true or false
 end
 
 local function tryEmote(entry, why)
-	entry.tries = entry.tries + 1
-	local result = performEmote(entry.token, entry.target)
-	ns.Debug(("Emote /%s at %s%s%s (WoW returned %s)."):format(entry.token:lower(), entry.target,
-		why and (", " .. why) or "", isMoving() and ", while moving" or "", tostring(result)))
+	entry.tries, entry.at, entry.moving = entry.tries + 1, now(), isMoving()
+	-- Aim afresh each try: the victim may not be your target any more.
+	local target = emoteTarget(entry.ctx)
+	local result = performEmote(entry.token, target)
+	ns.Debug(("Emote /%s at %s%s%s (WoW returned %s)."):format(entry.token:lower(), target,
+		why and (", " .. why) or "", entry.moving and ", while moving" or "", tostring(result)))
+end
+
+-- The emote showed or was given up on: a prayer held back for it can go out
+-- on your next key press.
+local function emoteDone()
+	pendingEmote = nil
+	if queued then
+		queued.to = math.min(math.max(queued.to, now() + 1), queued.cap)
+	end
 end
 
 local function retryEmote(why)
 	local entry = pendingEmote
-	if not entry then return end
-	if now() > entry.deadline or entry.tries >= EMOTE_TRIES then
-		pendingEmote = nil
-		ns.Debug("The emote never showed; giving up on it.")
-		return
-	end
+	if not entry or entry.tries >= EMOTE_TRIES or now() > entry.deadline then return end
+	-- A try made standing still may already be on its way to chat.
+	if not entry.moving and now() - entry.at < EMOTE_SETTLE then return end
 	tryEmote(entry, why)
+end
+
+local function startEmote(token, ctx)
+	local entry = { token = token, ctx = ctx, deadline = now() + KEY_WINDOW, tries = 0 }
+	pendingEmote = entry
+	tryEmote(entry)
+	C_Timer.After(KEY_WINDOW + EMOTE_SETTLE, function()
+		if pendingEmote == entry then
+			ns.Debug("The emote never showed; giving up on it.")
+			emoteDone()
+		end
+	end)
 end
 
 -- CHAT_MSG_TEXT_EMOTE: our own emote showing in chat means it worked.
 function ns.OnTextEmote(guid)
 	if not pendingEmote then return end
 	if guid ~= nil and not isSecret(guid) and guid ~= (playerGUID or UnitGUID("player")) then return end
-	pendingEmote = nil
 	ns.Debug("Emote showed.")
+	emoteDone()
 end
 
 function ns.OnStoppedMoving()
@@ -308,14 +333,18 @@ function ns.OnKeyPress(source)
 				InCombatLockdown() and " (in combat)" or ""))
 		end
 	end
-	if pendingEmote and now() - pendingEmote.at >= 0.25 then
-		pendingEmote.at = now()
-		retryEmote("retry on key press")
-	end
-	if not queued then return end
-	local t = now()
-	if t < queued.from then return end
+	retryEmote("retry on key press")
 	local entry = queued
+	if not entry then return end
+	local t = now()
+	if t < entry.from then return end
+	if pendingEmote and t <= entry.cap then
+		if not entry.told then
+			entry.told = true
+			ns.Debug("Prayer waits for the emote.")
+		end
+		return
+	end
 	queued = nil
 	if t > entry.to then return end
 	ns.Debug("Key press seen (" .. tostring(source) .. ").")
@@ -329,15 +358,20 @@ end
 
 local function queuePrayer(text)
 	local t = now()
-	local entry = { text = text, from = t, to = t + KEY_WINDOW }
+	local entry = { text = text, from = t, to = t + KEY_WINDOW, cap = t + PRAYER_CAP }
 	queued = entry
 	ns.Debug("Prayer waits for your next keypress.")
-	C_Timer.After(KEY_WINDOW, function()
-		if queued == entry then
-			queued = nil
-			ns.Debug("No keypress in time; prayer dropped.")
+	local function expire()
+		if queued ~= entry then return end
+		local left = (pendingEmote and entry.cap or entry.to) - now()
+		if left > 0 then
+			C_Timer.After(pendingEmote and math.min(left, 0.1) or left, expire)
+			return
 		end
-	end)
+		queued = nil
+		ns.Debug("No keypress in time; prayer dropped.")
+	end
+	C_Timer.After(KEY_WINDOW, expire)
 end
 
 function ns.HasQueuedPrayer()
@@ -352,10 +386,7 @@ function ns.Perform(prayer, ctx, fromKeypress)
 	local mode = ns.db.mode
 	if mode ~= "custom" then
 		-- Aim at the corpse only while it's still targeted, never at someone else.
-		local entry = { token = token, target = emoteTarget(ctx), at = now(),
-			deadline = now() + KEY_WINDOW, tries = 0 }
-		pendingEmote = entry
-		tryEmote(entry)
+		startEmote(token, ctx)
 	end
 	if mode ~= "builtin" then
 		if fromKeypress then
