@@ -1,5 +1,6 @@
 -- Usage: lua5.1 tests/validate_prayers.lua [repo root]
--- Validates every prayer: 10-20 words (incl. auto-prefixed player name),
+-- Validates every prayer: 10-20 words as shown in chat (names count as two
+-- words, since Forever names carry a surname),
 -- fits WoW's 255-char chat limit at worst case, known emotes & placeholders.
 local root = arg[1] or "."
 local ns = {}
@@ -48,7 +49,10 @@ local function check(label, pool)
 		total = total + 1
 		local token, text = entry[1], entry[2]
 		local where = ("%s #%d"):format(label, i)
-		local w = words(text) + 1
+		-- As shown in chat: Forever names carry a surname, so your auto-prefixed
+		-- name and each {name} count as two words.
+		local _, nameCount = text:gsub("{name}", "")
+		local w = words(text) + 2 + nameCount
 		hist[w] = (hist[w] or 0) + 1
 		if w < MIN_WORDS or w > MAX_WORDS then
 			errors[#errors + 1] = ("%s: %d words: %s"):format(where, w, text)

@@ -3,7 +3,7 @@ local _, ns = ...
 
 ns.ClassPrayers.DRUID = {
 	reverent = {
-		{ "PRAY", "scatters a handful of seeds over {name}. \"Sleep in the roots of {zone}, and wake as something green.\"" },
+		{ "PRAY", "scatters seeds over {name}. \"Sleep in the roots of {zone}, and wake as something green.\"" },
 		{ "MOURN", "presses an acorn into the earth beside {name}. \"In a hundred years, an oak will remember you.\"" },
 		{ "PRAY", "lifts their face to the moon. \"Elune, light {name}'s path through the Emerald Dream.\"" },
 		{ "BOW", "returns {name} to the Earth Mother. \"What she lent you, she now gathers back.\"" },
@@ -37,7 +37,7 @@ ns.ClassPrayers.DRUID = {
 		{ "PRAY", "murmurs, \"Malorne's children run free in the Dream. Run with them, {name}.\"" },
 		{ "MOURN", "murmurs, \"{spell} fell on you like a summer storm, {name}. Now comes the quiet after.\"" },
 		{ "COMFORT", "strokes {name}'s brow. \"Even the fiercest beast lies down at last. There is no shame in it.\"" },
-		{ "PRAY", "whispers, \"I could call you back with Rebirth, {name}. But the cycle asks me to let you rest.\"" },
+		{ "PRAY", "whispers, \"I could call you back with Rebirth, {name}. The cycle bids me let you rest.\"" },
 		{ "SALUTE", "says, \"You were a worthy rival, {name}. The pack remembers its rivals longest.\"" },
 		{ "PRAY", "invokes Cenarius over {name}. \"Let their bones become roots, and their roots become shelter.\"" },
 		{ "BOW", "tells {name}, \"The forest never asks whose side the rain fell on.\"" },
@@ -57,7 +57,7 @@ ns.ClassPrayers.DRUID = {
 	satire = {
 		{ "SHRUG", "says, \"I could cast Rebirth on you, {name}. I could also not. I chose not.\"" },
 		{ "GLOAT", "tells {name}, \"You died to Moonfire. Just Moonfire. Eleven of them. Think about that.\"" },
-		{ "PITY", "notes that {name} was killed by a bear, a cat, and a Moonkin. All of them were me." },
+		{ "PITY", "notes that {name} was killed by a bear, a cat, and a Moonkin. All were me." },
 		{ "SIGH", "says, \"Entangling Roots, {name}. You stood still for ten seconds. You were so good at it.\"" },
 		{ "MOURN", "casts Rejuvenation on {name}'s corpse out of habit. It ticks for nothing, twelve seconds straight." },
 		{ "PITY", "offers {name} an Innervate. \"Oh, you're a {class}. And dead. Never mind.\"" },

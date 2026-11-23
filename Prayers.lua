@@ -17,7 +17,7 @@ ns.ClassPrayers = {} -- [englishClass] = { reverent = {...}, satire = {...} }, f
 
 ns.Prayers.reverent = {
 	{ "PRAY", "lays a hand on {name}'s brow. \"Light, receive this soul and guide it gently home.\"" },
-	{ "KNEEL", "scoops a handful of earth over {name}. \"Dust thou art, and unto the dust of {zone} thou shalt return.\"" },
+	{ "KNEEL", "scoops earth over {name}. \"Dust thou art, and unto the dust of {zone} thou shalt return.\"" },
 	{ "MOURN", "closes the eyes of the fallen {class}. \"Rest now, {name}. Thy battle is ended.\"" },
 	{ "PRAY", "lifts their hands to the heavens. \"Forgive {name}, for they knew not whom they fought.\"" },
 	{ "SALUTE", "says, \"Go in peace, {name}. Thou didst fight with honor in {zone}.\"" },

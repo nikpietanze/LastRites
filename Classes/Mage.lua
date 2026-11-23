@@ -34,7 +34,7 @@ ns.ClassPrayers.MAGE = {
 		{ "PRAY", "invokes an old Kirin Tor benediction: \"May thy mind be clear, {name}, and thy rest unbroken.\"" },
 		{ "BOW", "speaks, \"The arcane is a borrowed fire, {name}. Today thou hast returned it.\"" },
 		{ "SIGH", "watches the last mana fade from {name}. \"Even the brightest spark goes out.\"" },
-		{ "PRAY", "lights a candle with a whispered word. \"For {name}, who walked into {zone} and did not walk out.\"" },
+		{ "PRAY", "lights a candle with a word. \"For {name}, who walked into {zone} and never walked out.\"" },
 		{ "MOURN", "lays a sprig of frost-rimmed Silverleaf on {name}. \"Cold, so it will never wilt.\"" },
 		{ "KNEEL", "writes {name}'s name in the frost on the ground. \"Until the sun takes it, thou art remembered.\"" },
 		{ "COMFORT", "whispers, \"Thy thoughts were thine own, {name}. No blade can unlearn what thou knew.\"" },
