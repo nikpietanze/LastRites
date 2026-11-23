@@ -35,7 +35,7 @@ Everything is under **Esc → Options → AddOns → Last Rites** (or type `/rit
 |---|---|
 | Rites | Perform last rites (master switch), tone (mixed, reverent or satirical), what to perform (emote and prayer, emote only, or prayer only) |
 | Where | Battlegrounds, arenas, world PvP |
-| Timing | Chance per kill, cooldown between rites, pause before the prayer |
+| Timing | Chance per kill, cooldown between rites |
 | Nemesis | Nemesis lines, kills to become a nemesis |
 
 Plus **Preview** (a sample only you see), **Test** (a real rite on your target), **Your nemeses** and **Reset kill counts**. Options that depend on another one gray out while it's off, and the panel's **Defaults** button restores everything.

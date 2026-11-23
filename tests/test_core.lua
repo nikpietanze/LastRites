@@ -298,18 +298,6 @@ test("logging in during combat sets up the key frame once combat ends", function
 	eq(#W.chat, 1)
 end)
 
-test("a pause delays the prayer", function()
-	local W = fresh()
-	W.ns.db.delay = 1.5
-	kill(W)
-	eq(#W.emotes, 1)
-	W.press()
-	eq(#W.chat, 0, "key presses during the pause don't count")
-	W.advance(1.5)
-	W.press()
-	eq(#W.chat, 1, "first key press after the pause")
-end)
-
 test("a kill during chat lockdown gets no rite, now or later", function()
 	local W = fresh()
 	W.slash("debug")
@@ -335,12 +323,11 @@ test("a lockdown skip doesn't use up the cooldown", function()
 	eq(#W.emotes, 1)
 end)
 
-test("prayer is dropped if lockdown starts during the pause", function()
+test("prayer is dropped if chat locks down before your key press", function()
 	local W = fresh()
-	W.ns.db.delay = 0.5
 	kill(W)
 	W.lockdown = true
-	W.advance(1)
+	W.advance(0.5)
 	W.press()
 	W.lockdown = false
 	W.advance(60)
@@ -357,13 +344,9 @@ test("/rites test during lockdown explains instead of performing", function()
 	assert(W.printed[#W.printed]:find("locked"), W.printed[#W.printed])
 end)
 
-test("saved 1.5s pause from before version 2 becomes 0; a chosen pause is kept", function()
-	local W = fresh({ version = 1, delay = 1.5 })
-	eq(W.ns.db.delay, 0)
-	local W2 = fresh({ version = 1, delay = 3 })
-	eq(W2.ns.db.delay, 3)
-	local W3 = fresh({ version = 2, delay = 1.5 })
-	eq(W3.ns.db.delay, 1.5)
+test("the old pause setting is removed from saved settings", function()
+	local W = fresh({ version = 2, delay = 0.5 })
+	eq(W.ns.db.delay, nil)
 end)
 
 test("tone reverent only draws reverent lines", function()

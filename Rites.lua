@@ -4,7 +4,7 @@
 -- addons, so kills come from the standalone PARTY_KILL event and the killing
 -- spell from the player's own successful casts. Chat can be locked down by the
 -- client; a rite is only worth it in the moment, so a kill during a lockdown
--- gets no rite, and a prayer blocked during the pause is dropped.
+-- gets no rite, and a prayer blocked when it would go out is dropped.
 --
 -- WoW only lets addons send /e text during a real keypress or click. The
 -- built-in emote plays right away on the kill; the prayer goes out on your
@@ -249,12 +249,12 @@ function ns.KeyTest()
 	ns.Print("Key test: for 15 seconds, each kind of press Last Rites can see is listed once. Try a key, an ability by keybind, an ability by clicking, moving and jumping. Best done while in combat.")
 end
 
-local function queuePrayer(text, delay)
+local function queuePrayer(text)
 	local t = now()
-	local entry = { text = text, from = t + delay, to = t + delay + KEY_WINDOW }
+	local entry = { text = text, from = t, to = t + KEY_WINDOW }
 	queued = entry
 	ns.Debug("Prayer waits for your next keypress.")
-	C_Timer.After(delay + KEY_WINDOW, function()
+	C_Timer.After(KEY_WINDOW, function()
 		if queued == entry then
 			queued = nil
 			ns.Debug("No keypress in time; prayer dropped.")
@@ -266,9 +266,9 @@ function ns.HasQueuedPrayer()
 	return queued ~= nil
 end
 
--- Plays the built-in emote, then the prayer after the pause. fromKeypress:
+-- Plays the built-in emote, then the prayer on your next key press. fromKeypress:
 -- this call already runs inside a keypress or click (slash command, button),
--- so the prayer can go out right away when there's no pause.
+-- so the prayer can go out right away.
 function ns.Perform(prayer, ctx, fromKeypress)
 	local token, text = prayer[1], ns.Fill(prayer[2], ctx)
 	local mode = ns.db.mode
@@ -279,11 +279,10 @@ function ns.Perform(prayer, ctx, fromKeypress)
 		ns.Debug(("Emote /%s at %s (WoW returned %s)."):format(token:lower(), target, tostring(result)))
 	end
 	if mode ~= "builtin" then
-		local delay = mode == "both" and ns.db.delay or 0
-		if fromKeypress and delay == 0 then
+		if fromKeypress then
 			sendPrayer(text)
 		else
-			queuePrayer(text, delay)
+			queuePrayer(text)
 		end
 	end
 	return text

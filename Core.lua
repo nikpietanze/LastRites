@@ -4,7 +4,7 @@ local ADDON_NAME, ns = ...
 
 ns.COLOR = "d4af37"
 
-local DB_VERSION = 2
+local DB_VERSION = 3
 ns.DEFAULTS = {
 	enabled = true,
 	tone = "mixed", -- "reverent" | "satire" | "mixed"
@@ -16,7 +16,6 @@ ns.DEFAULTS = {
 	-- Timing
 	chance = 100, -- Percent of eligible kills that get a rite.
 	cooldown = 20, -- Seconds between rites.
-	delay = 0, -- Seconds between the built-in emote and the prayer.
 	-- Nemesis
 	nemesisEnabled = true,
 	nemesis = 3, -- Kills on the same player before nemesis lines take over.
@@ -56,11 +55,9 @@ local function copy(value)
 end
 
 function ns.Migrate(db)
-	-- Version 1 paused 1.5s before the prayer by default, which lost prayers
-	-- when you died or chat locked down during the pause.
-	if (db.version or 1) < 2 and db.delay == 1.5 then
-		db.delay = 0
-	end
+	-- Versions 1 and 2 had a pause before the prayer. The prayer now goes out
+	-- on your next key press, which is pause enough.
+	db.delay = nil
 	for key, value in pairs(ns.DEFAULTS) do
 		if db[key] == nil then
 			db[key] = copy(value)
@@ -96,9 +93,9 @@ local function printStatus()
 	ns.Print(("%s on client %s (%s), interface %s"):format(ns.Version(), tostring(version), tostring(build),
 		tostring(interface)))
 	local d = ns.db
-	print(("  %s | tone=%s mode=%s | bg=%s arena=%s world=%s | chance=%d%% cooldown=%ds delay=%.1fs | nemesis=%s at %d"):format(
+	print(("  %s | tone=%s mode=%s | bg=%s arena=%s world=%s | chance=%d%% cooldown=%ds | nemesis=%s at %d"):format(
 		d.enabled and "on" or "off", d.tone, d.mode, tostring(d.battlegrounds), tostring(d.arenas),
-		tostring(d.world), d.chance, d.cooldown, d.delay, tostring(d.nemesisEnabled), d.nemesis))
+		tostring(d.world), d.chance, d.cooldown, tostring(d.nemesisEnabled), d.nemesis))
 	print(("  zone=%s allowed=%s chatLockdown=%s debug=%s"):format(ns.ZoneType(),
 		tostring(ns.ZoneAllowed()), tostring(ns.InChatLockdown()), tostring(d.debug)))
 end

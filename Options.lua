@@ -106,9 +106,6 @@ ns.OnLoad(function()
 		"How often a killing blow gets a rite. Lower it if you kill a lot of people.", enabled, "enabled")
 	slider("cooldown", "Cooldown", 0, 120, 5, "%ds",
 		"The shortest time between two rites. Kills during the cooldown are still counted.", enabled, "enabled")
-	slider("delay", "Pause before the prayer", 0, 5, 0.5, "%.1fs",
-		"Wait this long after the built-in emote before the prayer. Only used with Emote and prayer. WoW only sends the prayer on a key press, so it goes out on your first key press after the pause.",
-		enabled, "enabled")
 
 	header("Nemesis")
 
