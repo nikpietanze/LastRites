@@ -10,6 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/nikpietanze/LastRites/releases/latest"><img src="https://img.shields.io/github/v/release/nikpietanze/LastRites?color=d4af37" alt="Latest release"></a>
+  <a href="https://www.curseforge.com/projects/1825204"><img src="https://img.shields.io/badge/CurseForge-Last%20Rites-f16436?logo=curseforge" alt="Get it on CurseForge"></a>
   <a href="https://github.com/nikpietanze/LastRites/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/nikpietanze/LastRites/tests.yml?label=tests" alt="Tests"></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/nikpietanze/LastRites?color=b48352" alt="MIT license"></a>
 </p>
