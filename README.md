@@ -34,7 +34,7 @@ Everything is under **Esc → Options → AddOns → Last Rites** (or type `/rit
 
 | Section | Settings |
 |---|---|
-| Rites | Perform last rites (master switch), tone (mixed, reverent or satirical), what to perform (emote and prayer, emote only, or prayer only), class-themed lines, avoid emotes that move your character (plays `/mourn` or `/comfort` in place of `/pray`, `/kneel`, `/bow` and `/salute`, which WoW refuses while you move; on by default) |
+| Rites | Perform last rites (master switch), tone (mixed, reverent or satirical), what to perform (emote and prayer, emote only, or prayer only), class-themed lines, avoid emotes that move your character (plays `/mourn` or `/comfort` in place of `/pray`, `/kneel` and `/bow`, which WoW refuses while you move; on by default) |
 | Where | Battlegrounds, arenas, world PvP |
 | Timing | Chance per kill, cooldown between rites |
 | Nemesis | Nemesis lines, kills to become a nemesis |

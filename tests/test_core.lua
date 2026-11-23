@@ -365,7 +365,7 @@ end)
 test("avoid poses plays a still emote for animated ones (on by default), keeping the line", function()
 	local W = fresh()
 	eq(W.ns.db.avoidPoses, true, "default")
-	local animated = { PRAY = true, KNEEL = true, BOW = true, SALUTE = true }
+	local animated = { PRAY = true, KNEEL = true, BOW = true }
 	local drewAnimated = false
 	W.target = { name = "Bob", guid = "Player-9-BOB" }
 	for i = 1, 300 do

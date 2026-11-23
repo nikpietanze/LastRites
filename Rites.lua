@@ -117,7 +117,6 @@ ns.POSE_EMOTES = {
 	PRAY = { "MOURN", "COMFORT" },
 	KNEEL = { "MOURN", "COMFORT" },
 	BOW = { "MOURN", "COMFORT" },
-	SALUTE = { "MOURN", "COMFORT" },
 }
 local STILL_VERBS = { MOURN = "mourn", COMFORT = "comfort" }
 
