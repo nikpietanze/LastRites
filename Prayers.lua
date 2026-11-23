@@ -13,6 +13,7 @@ local _, ns = ...
 -- Placeholders: {name} {class} {race} {zone} {spell} {count} {nth}
 
 ns.Prayers = {}
+ns.ClassPrayers = {} -- [englishClass] = { reverent = {...}, satire = {...} }, filled by Classes/*.lua
 
 ns.Prayers.reverent = {
 	{ "PRAY", "lays a hand on {name}'s brow. \"Light, receive this soul and guide it gently home.\"" },

@@ -3,8 +3,15 @@
 -- fits WoW's 255-char chat limit at worst case, known emotes & placeholders.
 local root = arg[1] or "."
 local ns = {}
-assert(loadfile(root .. "/Prayers.lua"))("LastRites", ns)
+-- Load Prayers.lua and the class files in TOC order.
+for line in io.lines(root .. "/LastRites.toc") do
+	line = line:gsub("\r", "")
+	if line == "Prayers.lua" or line:find("^Classes[\\/]") then
+		assert(loadfile(root .. "/" .. line:gsub("\\", "/")))("LastRites", ns)
+	end
+end
 local P = ns.Prayers
+local CLASSES = { "WARRIOR", "PALADIN", "PRIEST", "SHAMAN", "DRUID", "ROGUE", "MAGE", "WARLOCK", "HUNTER" }
 
 local MIN_WORDS, MAX_WORDS = 10, 20
 local EMOTES = {
@@ -12,7 +19,7 @@ local EMOTES = {
 	GLOAT = 1, COMFORT = 1, SIGH = 1, CRY = 1, SHRUG = 1,
 }
 local WORST = {
-	name = "Abcdefghijkl", class = "Demon Hunter", race = "Highmountain Tauren",
+	name = "Abcdefghijkl Mnopqrstuvwx", class = "Demon Hunter", race = "Highmountain Tauren",
 	zone = "The Temple of Atal'Hakkar Sunken Depths", spell = "Righteous Defense of the Ancients",
 	count = "1000", nth = "1000th",
 }
@@ -74,6 +81,17 @@ check("reverent", P.reverent)
 check("satire", P.satire)
 check("nemesis.reverent", P.nemesis.reverent)
 check("nemesis.satire", P.nemesis.satire)
+local classCounts = {}
+for _, class in ipairs(CLASSES) do
+	local pools = ns.ClassPrayers and ns.ClassPrayers[class]
+	if not pools then
+		errors[#errors + 1] = "missing class file for " .. class
+	else
+		check(class:lower() .. ".reverent", pools.reverent or {})
+		check(class:lower() .. ".satire", pools.satire or {})
+		classCounts[#classCounts + 1] = ("%s %d+%d"):format(class:lower(), #(pools.reverent or {}), #(pools.satire or {}))
+	end
+end
 
 print(("reverent %d | satire %d | nemesis %d + %d | total %d"):format(
 	#P.reverent, #P.satire, #P.nemesis.reverent, #P.nemesis.satire, total))
@@ -82,6 +100,7 @@ for w = MIN_WORDS - 3, MAX_WORDS + 3 do
 	if hist[w] then dist[#dist + 1] = w .. "w:" .. hist[w] end
 end
 print("word counts: " .. table.concat(dist, "  "))
+print("class lines (reverent+satire): " .. table.concat(classCounts, "  "))
 
 if #errors > 0 then
 	for _, e in ipairs(errors) do print("FAIL " .. e) end

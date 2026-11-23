@@ -127,11 +127,24 @@ local function poolFor(key, pool)
 	return key .. "-noposes", filtered[key]
 end
 
+local CLASS_SHARE = 0.5 -- With class lines on, this share of rites uses them.
+
+local function playerClass()
+	local _, class = UnitClass("player")
+	return class
+end
+
+-- Returns prayer, tone, isNemesis.
 function ns.Pick(killCount)
 	local prayers = ns.Prayers
 	local tone = ns.ResolveTone()
 	if ns.db.nemesisEnabled and killCount >= ns.db.nemesis then
 		return draw(poolFor("nemesis-" .. tone, prayers.nemesis[tone])), tone, true
+	end
+	local class = playerClass()
+	local classPool = ns.db.classLines and class and ns.ClassPrayers[class] and ns.ClassPrayers[class][tone]
+	if classPool and #classPool > 0 and math.random() < CLASS_SHARE then
+		return draw(poolFor(class .. "-" .. tone, classPool)), tone, false
 	end
 	return draw(poolFor(tone, prayers[tone])), tone, false
 end

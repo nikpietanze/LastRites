@@ -385,6 +385,36 @@ test("avoid poses skips /kneel lines (on by default), unless only the prayer is 
 	assert(kneels > 0, "turned off uses /kneel again")
 end)
 
+test("class lines: about half of rites use your class's lines, and they can be turned off", function()
+	local W = fresh()
+	W.playerClass = "Warlock"
+	W.ns.db.tone = "satire"
+	W.ns.db.avoidPoses = false
+	W.ns.ClassPrayers.WARLOCK.satire = { { "GLOAT", "tucks {name}'s soul into a shard. \"It's a little cramped in there, but cozy.\"" } }
+	local classSet = { [W.ns.ClassPrayers.WARLOCK.satire[1]] = true }
+	local hits = 0
+	for _ = 1, 400 do
+		if classSet[W.ns.Pick(1)] then hits = hits + 1 end
+	end
+	assert(hits > 120 and hits < 280, "about half: " .. hits)
+	W.ns.db.classLines = false
+	for _ = 1, 200 do
+		assert(not classSet[W.ns.Pick(1)], "class line while off")
+	end
+end)
+
+test("class lines are skipped for a class with no lines, and never replace nemesis lines", function()
+	local W = fresh()
+	W.playerClass = "Mage"
+	W.ns.ClassPrayers.MAGE = { reverent = {}, satire = {} }
+	for _ = 1, 100 do
+		local p = W.ns.Pick(1)
+		assert(p, "always picks something")
+		local _, _, nem = W.ns.Pick(5)
+		eq(nem, true)
+	end
+end)
+
 test("mixed tone draws from both pools", function()
 	local W = fresh()
 	local tones = {}

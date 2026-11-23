@@ -9,7 +9,7 @@ local function tocFiles(root)
 	local files = {}
 	for line in io.lines(root .. "/LastRites.toc") do
 		line = line:gsub("\r", "")
-		if line ~= "" and not line:find("^#") then files[#files + 1] = line end
+		if line ~= "" and not line:find("^#") then files[#files + 1] = (line:gsub("\\", "/")) end
 	end
 	return files
 end
@@ -53,6 +53,9 @@ function M.install(root, savedDB, beforeLogin)
 		if unit == "target" and W.target then return W.target.name end
 	end
 	_G.UnitExists = function(unit) return unit == "player" or (unit == "target" and W.target ~= nil) end
+	_G.UnitClass = function(unit)
+		if unit == "player" then return W.playerClass or "Rogue", (W.playerClass or "Rogue"):upper(), 4 end
+	end
 	_G.UnitIsUnit = function(a, b) return a == b or (UnitGUID(a) ~= nil and UnitGUID(a) == UnitGUID(b)) end
 	_G.UnitIsPlayer = function(unit) return unit == "player" or (unit == "target" and W.target and W.target.player ~= false) end
 	_G.UnitIsDeadOrGhost = function() return W.dead end
