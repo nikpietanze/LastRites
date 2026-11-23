@@ -645,24 +645,30 @@ test("an emote refused while moving is retried when you stop", function()
 	eq(#W.chat, 1, "prayer still sent")
 end)
 
-test("an emote refused while moving is retried on key presses, three tries at most", function()
+test("no emote retries while you keep moving; the prayer still goes out", function()
 	local W = fresh()
 	W.slash("debug")
 	W.target = { name = "Bob", guid = "Player-9-BOB" }
 	W.moving = true
 	kill(W)
-	W.press()
-	eq(#W.emotes, 2, "retried on the key press")
+	for _ = 1, 5 do W.advance(0.1); W.press() end
+	eq(#W.emotes, 1, "no tries while moving")
 	eq(#W.chat, 0, "the prayer waits for the emote")
-	for _ = 1, 4 do W.advance(0.1); W.press() end
-	eq(#W.emotes, 3, "three tries in all")
-	W.moving = false
-	W.fire("PLAYER_STOPPED_MOVING")
-	eq(#W.emotes, 3, "no fourth try")
 	W.advance(1.5)
 	assert(table.concat(W.printed, "\n"):find("giving up"), "debug says it gave up")
 	W.press()
 	eq(#W.chat, 1, "the prayer still goes out once the emote is given up on")
+end)
+
+test("emote retries stop at three tries", function()
+	local W = fresh()
+	W.target = { name = "Bob", guid = "Player-9-BOB" }
+	W.moving = true
+	kill(W)
+	W.moving = false
+	W.emoteDelay = 5 -- shown too late to count
+	for _ = 1, 6 do W.advance(0.25); W.press() end
+	eq(#W.emotes, 3, "three tries in all")
 end)
 
 test("the prayer goes out after the emote, not before", function()

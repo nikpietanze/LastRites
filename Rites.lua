@@ -279,6 +279,8 @@ end
 local function retryEmote(why)
 	local entry = pendingEmote
 	if not entry or entry.tries >= EMOTE_TRIES or now() > entry.deadline then return end
+	-- WoW refuses every emote while you move: wait until you stop.
+	if isMoving() then return end
 	-- A try made standing still may already be on its way to chat.
 	if not entry.moving and now() - entry.at < EMOTE_SETTLE then return end
 	tryEmote(entry, why)
