@@ -1,0 +1,28 @@
+name: Prayer suggestion
+description: Suggest a new reverent, satirical or nemesis line
+labels: [prayer]
+body:
+  - type: markdown
+    attributes:
+      value: Lines follow your character's name and must be 10 to 20 words including it. See "Writing prayers" in CONTRIBUTING.md.
+  - type: dropdown
+    id: tone
+    attributes:
+      label: Tone
+      options: ["Reverent", "Satirical", "Nemesis (reverent)", "Nemesis (satirical)"]
+    validations:
+      required: true
+  - type: dropdown
+    id: emote
+    attributes:
+      label: Built-in emote
+      options: ["PRAY", "KNEEL", "BOW", "SALUTE", "MOURN", "PITY", "VIOLIN", "GLOAT", "COMFORT", "SIGH", "CRY", "SHRUG"]
+    validations:
+      required: true
+  - type: textarea
+    id: lines
+    attributes:
+      label: Line(s)
+      description: "One per line, without your name. Example: kneels beside {name}. \"Blessed are the repair bills, for they shall be many.\""
+    validations:
+      required: true

@@ -1,0 +1,19 @@
+## Interface: 16001
+## Title: LastRites
+## Notes: Kneel, pray or play the world's smallest violin over the players you kill in PvP. Emote only, reverent or satirical.
+## Author: Nik Pietanze
+## Version: @project-version@
+## IconTexture: Interface\Icons\Spell_Holy_Resurrection
+## Category: PvP
+## X-License: MIT
+## X-Website: https://github.com/nikpietanze/LastRites
+## X-Category: PvP
+## SavedVariablesPerCharacter: LastRitesDB
+## AddonCompartmentFunc: LastRites_OnCompartmentClick
+## AddonCompartmentFuncOnEnter: LastRites_OnCompartmentEnter
+## AddonCompartmentFuncOnLeave: LastRites_OnCompartmentLeave
+
+Core.lua
+Prayers.lua
+Rites.lua
+Options.lua

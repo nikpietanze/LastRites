@@ -1,0 +1,12 @@
+package-as: LastRites
+
+manual-changelog:
+  filename: CHANGELOG.md
+  markup-type: markdown
+
+ignore:
+  - docs
+  - tests
+  - .github
+  - README.md
+  - CONTRIBUTING.md

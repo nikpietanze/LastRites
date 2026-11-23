@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="35%" r="75%">
+      <stop offset="0" stop-color="#262236"/>
+      <stop offset="0.6" stop-color="#121019"/>
+      <stop offset="1" stop-color="#07060a"/>
+    </radialGradient>
+    <linearGradient id="bronze" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d8b27a"/>
+      <stop offset="0.35" stop-color="#9a7444"/>
+      <stop offset="0.65" stop-color="#c49a5e"/>
+      <stop offset="1" stop-color="#5a4022"/>
+    </linearGradient>
+    <linearGradient id="bronzeIn" x1="1" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#3a2a16"/>
+      <stop offset="1" stop-color="#1a130a"/>
+    </linearGradient>
+    <radialGradient id="holy" cx="50%" cy="18%" r="60%">
+      <stop offset="0" stop-color="#ffe9a8" stop-opacity="0.75"/>
+      <stop offset="0.45" stop-color="#d4af37" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#d4af37" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ray" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff2c4" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#fff2c4" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="stone" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#c3c7cc"/>
+      <stop offset="0.55" stop-color="#8e949b"/>
+      <stop offset="1" stop-color="#5b6168"/>
+    </linearGradient>
+    <linearGradient id="stoneTop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3b4a24"/>
+      <stop offset="1" stop-color="#121a0a"/>
+    </linearGradient>
+    <radialGradient id="flame" cx="50%" cy="70%" r="60%">
+      <stop offset="0" stop-color="#fffbe6"/>
+      <stop offset="0.45" stop-color="#ffd25e"/>
+      <stop offset="1" stop-color="#e2741f"/>
+    </radialGradient>
+    <radialGradient id="candleGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ffd25e" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#ffd25e" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="inner">
+      <rect x="32" y="32" width="448" height="448" rx="52"/>
+    </clipPath>
+  </defs>
+
+  <rect x="8" y="8" width="496" height="496" rx="72" fill="url(#bronze)"/>
+  <rect x="24" y="24" width="464" height="464" rx="58" fill="url(#bronzeIn)"/>
+  <rect x="32" y="32" width="448" height="448" rx="52" fill="url(#bg)"/>
+
+  <g clip-path="url(#inner)">
+    <rect x="32" y="32" width="448" height="448" fill="url(#holy)"/>
+    <!-- light rays from above -->
+    <g fill="url(#ray)">
+      <path d="M256 20 L200 330 L232 330 Z"/>
+      <path d="M256 20 L280 330 L312 330 Z"/>
+      <path d="M256 20 L130 300 L160 306 Z"/>
+      <path d="M256 20 L352 306 L382 300 Z"/>
+    </g>
+
+    <!-- ground -->
+    <path d="M20 404 C90 386 170 380 256 382 C342 380 422 388 500 400 L500 500 L20 500 Z" fill="url(#ground)"/>
+    <path d="M20 404 C90 386 170 380 256 382 C342 380 422 388 500 400" fill="none" stroke="#6b8340" stroke-width="5"/>
+    <g stroke="#6b8340" stroke-width="4" stroke-linecap="round">
+      <path d="M96 394 L90 380 M104 393 L106 378 M112 392 L120 381"/>
+      <path d="M392 392 L386 378 M400 393 L402 377 M408 394 L416 382"/>
+    </g>
+  </g>
+
+  <!-- tombstone -->
+  <path d="M168 396 L168 228 C168 168 208 132 256 132 C304 132 344 168 344 228 L344 396 Z" fill="url(#stone)" stroke="#16181c" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M184 380 L184 230 C184 180 216 150 256 150 C296 150 328 180 328 230 L328 380" fill="none" stroke="#3e434a" stroke-opacity="0.55" stroke-width="4"/>
+  <path d="M168 228 C168 168 208 132 256 132 C304 132 344 168 344 228 L330 228 C330 178 298 146 256 146 C214 146 182 178 182 228 Z" fill="url(#stoneTop)"/>
+  <!-- engraving -->
+  <text x="258" y="262" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="bold" font-size="64" letter-spacing="4" fill="#e9ecef" fill-opacity="0.35">RIP</text>
+  <text x="256" y="260" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="bold" font-size="64" letter-spacing="4" fill="#33373d">RIP</text>
+  <path d="M214 296 L298 296" stroke="#33373d" stroke-width="5" stroke-linecap="round"/>
+  <path d="M226 318 L286 318" stroke="#33373d" stroke-width="5" stroke-linecap="round"/>
+  <!-- crack -->
+  <path d="M318 168 L306 196 L316 214 L302 240" fill="none" stroke="#2a2e33" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- base slab -->
+  <rect x="148" y="388" width="216" height="26" rx="6" fill="#6f757c" stroke="#16181c" stroke-width="7"/>
+
+  <!-- peacebloom -->
+  <g transform="translate(130 392)">
+    <path d="M0 0 C-2 -18 2 -30 0 -44" stroke="#4f7a2c" stroke-width="6" stroke-linecap="round" fill="none"/>
+    <path d="M0 -18 C-14 -26 -22 -22 -26 -14 C-16 -12 -8 -12 0 -18 Z" fill="#5f8f34" stroke="#1d2e0e" stroke-width="3"/>
+    <g transform="translate(0 -52)" stroke="#3a3326" stroke-width="3">
+      <ellipse cx="0" cy="-13" rx="8" ry="12" fill="#fbf6e6"/>
+      <ellipse cx="0" cy="-13" rx="8" ry="12" fill="#fbf6e6" transform="rotate(72)"/>
+      <ellipse cx="0" cy="-13" rx="8" ry="12" fill="#fbf6e6" transform="rotate(144)"/>
+      <ellipse cx="0" cy="-13" rx="8" ry="12" fill="#fbf6e6" transform="rotate(216)"/>
+      <ellipse cx="0" cy="-13" rx="8" ry="12" fill="#fbf6e6" transform="rotate(288)"/>
+      <circle cx="0" cy="0" r="7" fill="#f2c230"/>
+    </g>
+  </g>
+
+  <!-- candle -->
+  <circle cx="384" cy="326" r="46" fill="url(#candleGlow)"/>
+  <rect x="370" y="338" width="28" height="54" rx="4" fill="#efe6cf" stroke="#2a2418" stroke-width="5"/>
+  <path d="M372 346 C378 350 380 358 378 364" fill="none" stroke="#d6c9a6" stroke-width="4" stroke-linecap="round"/>
+  <path d="M384 338 L384 328" stroke="#2a2418" stroke-width="4" stroke-linecap="round"/>
+  <path d="M384 296 C394 310 398 318 398 324 C398 332 392 337 384 337 C376 337 370 332 370 324 C370 318 374 310 384 296 Z" fill="url(#flame)" stroke="#7a3a0c" stroke-width="3.5"/>
+</svg>
