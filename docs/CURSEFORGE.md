@@ -1,4 +1,4 @@
-Kneel, pray or play the world's smallest violin over the players you kill in PvP.
+A short funeral emote over every enemy player you kill in PvP, with reverent or satirical prayers your victim can see.
 
 ```
 Nik kneels before Grimgor.
@@ -7,12 +7,12 @@ Nik kneels beside Grimgor. "Blessed are the repair bills, for they shall be many
 
 ## Features
 
-- **Emote only.** A built-in emote at the corpse plus one `/e` line. No `/say`, no `/yell`.
-- **Your victim sees it.** Built-in emotes cross factions: "Nik kneels before you." Your side reads the full prayer.
-- **Reverent or satirical.** 100 of each, or a coin flip. Every line is 10 to 20 words.
-- **Personal.** Lines can name their class, race, the zone and what killed them.
-- **Nemesis lines.** Kill someone three times and the rites start counting funerals.
-- **Toggle anything.** Battlegrounds, arenas, world PvP, chance per kill, cooldown and more.
+- **Emote only.** A built-in emote at the corpse plus one `/e` line. No `/say`, no `/yell`, no chat spam.
+- **Your victim sees it.** Built-in emotes cross factions, so they get "Nik kneels before you." Your side reads the full prayer.
+- **Reverent or satirical.** 100 of each, or a coin flip between them. Every line is 10 to 20 words.
+- **Personal.** Lines can name the victim's class, race, the zone and the spell that killed them.
+- **Nemesis lines.** Kill the same player three times and the rites start counting funerals.
+- **Toggle anything.** Battlegrounds, arenas and world PvP each on or off, plus chance per kill, cooldown and what to perform.
 
 ## Commands
 
@@ -26,9 +26,9 @@ Nik kneels beside Grimgor. "Blessed are the repair bills, for they shall be many
 
 ## Good to know
 
-- Rites that land while WoW has chat locked for addons wait until it lifts.
-- Kills are counted even when a rite is skipped, so nemesis counts stay honest.
+- If WoW has chat locked for addons when you land a kill, the rite waits until it lifts.
+- Kills count even when a rite is skipped, so nemesis counts stay honest.
 
 ## Bugs and ideas
 
-[GitHub Issues](https://github.com/nikpietanze/LastRites/issues). Include `/rites status` and any Lua errors.
+[GitHub Issues](https://github.com/nikpietanze/LastRites/issues). Include `/rites status` and any Lua errors. Prayer suggestions welcome.
