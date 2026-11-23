@@ -129,11 +129,20 @@ function ns.Fill(template, ctx)
 end
 
 function ns.BuildContext(name, guid, count)
-	local ctx = { name = name, count = count, nth = ns.Ordinal(count) }
+	local ctx = { name = name, guid = guid, count = count, nth = ns.Ordinal(count) }
 	if guid and GetPlayerInfoByGUID then
-		local class, _, race = GetPlayerInfoByGUID(guid)
+		local class, _, race, _, _, fullName, realm = GetPlayerInfoByGUID(guid)
 		if not isSecret(class) then ctx.class = class end
 		if not isSecret(race) then ctx.race = race end
+		-- For aiming the emote by name: the bare character name (Forever can
+		-- add a surname after a space), plus the realm for cross-realm players.
+		if type(fullName) == "string" and not isSecret(fullName) then
+			local base = stripRealm(fullName):match("^(%S+)")
+			if base and type(realm) == "string" and not isSecret(realm) and realm ~= "" then
+				base = base .. "-" .. realm:gsub("[%s%-]", "")
+			end
+			ctx.emoteName = base
+		end
 	end
 	ctx.zone = GetRealZoneText and GetRealZoneText() or nil
 	if lastCast and now() - lastCast.time <= SPELL_WINDOW then
@@ -162,8 +171,40 @@ local function sendEmote(text)
 	end
 end
 
-local function corpseTargeted(name)
-	return UnitExists("target") and not UnitIsUnit("target", "player") and stripRealm(UnitName("target")) == name
+local UNIT_TOKENS = { "target", "softenemy", "mouseover", "focus" }
+
+local function sameGUID(unit, guid)
+	local unitGUID = UnitGUID(unit)
+	return unitGUID ~= nil and not isSecret(unitGUID) and unitGUID == guid
+end
+
+-- A unit token for the victim if they're your target, soft target, mouseover,
+-- focus or have a nameplate.
+local function findUnit(guid)
+	for _, unit in ipairs(UNIT_TOKENS) do
+		if sameGUID(unit, guid) then return unit end
+	end
+	if C_NamePlate and C_NamePlate.GetNamePlates then
+		for _, plate in ipairs(C_NamePlate.GetNamePlates() or {}) do
+			local unit = plate.namePlateUnitToken
+			if unit and sameGUID(unit, guid) then return unit end
+		end
+	end
+end
+
+-- Who to aim the built-in emote at: the victim's unit if we can find one, else
+-- their name, else the current target if it's them by name, else nobody.
+-- Never yourself.
+local function emoteTarget(ctx)
+	if ctx.guid and ctx.guid ~= UnitGUID("player") then
+		local unit = findUnit(ctx.guid)
+		if unit then return unit end
+		if ctx.emoteName then return ctx.emoteName end
+	end
+	if UnitExists("target") and not UnitIsUnit("target", "player") and stripRealm(UnitName("target")) == ctx.name then
+		return "target"
+	end
+	return "none"
 end
 
 local queued -- { text, from, to }: a prayer waiting for a keypress
@@ -233,7 +274,7 @@ function ns.Perform(prayer, ctx, fromKeypress)
 	local mode = ns.db.mode
 	if mode ~= "custom" then
 		-- Aim at the corpse only while it's still targeted, never at someone else.
-		local target = corpseTargeted(ctx.name) and "target" or "none"
+		local target = emoteTarget(ctx)
 		local result = performEmote(token, target)
 		ns.Debug(("Emote /%s at %s (WoW returned %s)."):format(token:lower(), target, tostring(result)))
 	end

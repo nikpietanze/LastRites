@@ -70,10 +70,33 @@ test("only ever uses the EMOTE channel", function()
 	for _, c in ipairs(W.chat) do eq(c[2], "EMOTE") end
 end)
 
-test("emote has no target when the corpse isn't targeted", function()
+test("emote is aimed at the victim by name when they aren't targeted", function()
 	local W = fresh()
 	W.target = { name = "Someone", guid = "Player-9-SOME" }
 	kill(W)
+	eq(W.emotes[1][2], "Bob")
+end)
+
+test("emote name drops a surname and adds the realm for cross-realm victims", function()
+	local W = fresh()
+	W.players["Player-9-LOL"] = { class = "Shaman", race = "Orc", name = "Lolurk Shamaninema", realm = "Some Realm" }
+	kill(W, "Player-9-LOL")
+	eq(W.emotes[1][2], "Lolurk-SomeRealm")
+	eq(W.ns.db.kills["Lolurk Shamaninema"], 1)
+end)
+
+test("emote uses the victim's nameplate unit when there is one", function()
+	local W = fresh()
+	W.nameplates = { { namePlateUnitToken = "nameplate3", guid = "Player-9-BOB" } }
+	kill(W)
+	eq(W.emotes[1][2], "nameplate3")
+end)
+
+test("emote is never aimed at yourself", function()
+	local W = fresh()
+	W.players["Player-1-PLAYER"] = { class = "Rogue", race = "Human", name = "Aldric" }
+	W.target = { name = "Aldric", guid = "Player-1-PLAYER" }
+	W.slash("test")
 	eq(W.emotes[1][2], "none")
 end)
 
@@ -507,7 +530,7 @@ test("debug explains every reason a kill gets no rite", function()
 	kill(W)
 	W.press()
 	local out = table.concat(W.printed, "\n")
-	assert(out:find("Your kill: Bob") and out:find("Emote /%a+ at none %(WoW returned true%)") and out:find("Sending prayer"), out)
+	assert(out:find("Your kill: Bob") and out:find("Emote /%a+ at Bob %(WoW returned true%)") and out:find("Sending prayer"), out)
 end)
 
 test("unknown command prints help", function()

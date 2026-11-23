@@ -43,20 +43,24 @@ function M.install(root, savedDB, beforeLogin)
 	_G.UnitGUID = function(unit)
 		if unit == "player" then return "Player-1-PLAYER" end
 		if unit == "target" and W.target then return W.target.guid end
+		for _, plate in ipairs(W.nameplates or {}) do
+			if plate.namePlateUnitToken == unit then return plate.guid end
+		end
 	end
+	_G.C_NamePlate = { GetNamePlates = function() return W.nameplates or {} end }
 	_G.UnitName = function(unit)
 		if unit == "player" then return "Aldric" end
 		if unit == "target" and W.target then return W.target.name end
 	end
 	_G.UnitExists = function(unit) return unit == "player" or (unit == "target" and W.target ~= nil) end
-	_G.UnitIsUnit = function(a, b) return a == b end
+	_G.UnitIsUnit = function(a, b) return a == b or (UnitGUID(a) ~= nil and UnitGUID(a) == UnitGUID(b)) end
 	_G.UnitIsPlayer = function(unit) return unit == "player" or (unit == "target" and W.target and W.target.player ~= false) end
 	_G.UnitIsDeadOrGhost = function() return W.dead end
 	_G.IsInInstance = function() return W.instance[1], W.instance[2] end
 	_G.GetRealZoneText = function() return W.zone end
 	_G.GetPlayerInfoByGUID = function(guid)
 		local p = W.players[guid]
-		if p then return p.class, "X", p.race, "X", 2, p.name, "Realm" end
+		if p then return p.class, "X", p.race, "X", 2, p.name, p.realm or "" end
 	end
 	_G.C_Spell = {
 		GetSpellName = function(id) return W.spells[id] end,
