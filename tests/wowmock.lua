@@ -76,6 +76,15 @@ function M.install(root, savedDB, beforeLogin)
 	_G.GameTooltip = setmetatable({}, { __index = function() return function() end end })
 	_G.SlashCmdList = {}
 	_G.InCombatLockdown = function() return W.combat end
+	W.hooks = {}
+	_G.UIParent = {}
+	_G.UseAction = function() end
+	_G.MoveForwardStart = function() end
+	_G.hooksecurefunc = function(name, fn)
+		local orig = _G[name]
+		W.hooks[name] = true
+		_G[name] = function(...) orig(...); fn(...) end
+	end
 	_G.CreateFrame = function()
 		local f = { events = {}, scripts = {} }
 		function f:RegisterEvent(e) self.events[e] = true end
@@ -85,6 +94,10 @@ function M.install(root, savedDB, beforeLogin)
 			self.scripts[name] = fn
 			if name == "OnEvent" then self.onEvent = fn end
 		end
+		function f:SetAllPoints() end
+		function f:SetFrameStrata(strata) self.strata = strata end
+		function f:EnableMouse(v) self.mouse = v end
+		function f:Show() self.shown = true end
 		function f:EnableKeyboard(v)
 			assert(not W.combat, "EnableKeyboard in combat")
 			self.keyboard = v

@@ -155,6 +155,7 @@ local commands = {
 	end,
 	test = function(args) ns.TestRite(args ~= "" and args or nil, true) end,
 	stats = printStats,
+	keytest = function() ns.KeyTest() end,
 	status = printStatus,
 	debug = function()
 		ns.db.debug = not ns.db.debug
@@ -174,6 +175,6 @@ SlashCmdList.LASTRITES = function(input)
 	elseif commands[command] then
 		commands[command](args)
 	else
-		ns.Print("Commands: /rites [options | on | off | preview [name] [kills] | test [name] | stats | status | debug]")
+		ns.Print("Commands: /rites [options | on | off | preview [name] [kills] | test [name] | stats | keytest | status | debug]")
 	end
 end

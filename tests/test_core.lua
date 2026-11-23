@@ -220,6 +220,41 @@ test("the key frame passes keys through and is set up out of combat", function()
 	eq(keyFrames, 1)
 end)
 
+test("using an ability or starting to move also sends the prayer", function()
+	local W = fresh()
+	kill(W)
+	UseAction(1)
+	eq(#W.chat, 1, "ability")
+	W.advance(100)
+	kill(W)
+	MoveForwardStart()
+	eq(#W.chat, 2, "movement")
+	assert(W.hooks.UseAction and W.hooks.MoveForwardStart)
+end)
+
+test("the key frame never blocks the mouse", function()
+	local W = fresh()
+	for _, f in ipairs(W.frames) do
+		if f.keyboard then
+			eq(f.mouse, false)
+			eq(f.shown, true)
+		end
+	end
+end)
+
+test("/rites keytest lists presses for 10 seconds", function()
+	local W = fresh()
+	W.slash("keytest")
+	W.press("W")
+	UseAction(1)
+	assert(W.printed[#W.printed - 1]:find("saw key W"), W.printed[#W.printed - 1])
+	assert(W.printed[#W.printed]:find("saw UseAction"), W.printed[#W.printed])
+	W.advance(11)
+	local n = #W.printed
+	W.press("W")
+	eq(#W.printed, n, "stops after 10 seconds")
+end)
+
 test("logging in during combat sets up the key frame once combat ends", function()
 	local saved = nil
 	local W = mock.install(root, saved, function(W) W.combat = true end)

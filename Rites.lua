@@ -178,14 +178,28 @@ local function sendPrayer(text)
 end
 
 -- Called on every key press (the keys still reach the game as normal).
-function ns.OnKeyPress()
+local keyTestUntil, keyTestShown = 0, 0
+
+-- Called on every key press, ability use and movement start (the input still
+-- reaches the game as normal). source says what was seen, for /rites keytest.
+function ns.OnKeyPress(source)
+	if now() < keyTestUntil and keyTestShown < 8 then
+		keyTestShown = keyTestShown + 1
+		ns.Print("Key test: saw " .. tostring(source) .. ".")
+	end
 	if not queued then return end
 	local t = now()
 	if t < queued.from then return end
 	local entry = queued
 	queued = nil
 	if t > entry.to then return end
+	ns.Debug("Key press seen (" .. tostring(source) .. ").")
 	sendPrayer(entry.text)
+end
+
+function ns.KeyTest()
+	keyTestUntil, keyTestShown = now() + 10, 0
+	ns.Print("Key test: for 10 seconds, every press Last Rites can see is listed. Try keys, abilities, moving and jumping.")
 end
 
 local function queuePrayer(text, delay)
@@ -354,11 +368,31 @@ local keyFrame
 local function setupKeyFrame()
 	if keyFrame then return true end
 	if InCombatLockdown() then return false end
-	keyFrame = CreateFrame("Frame", "LastRitesKeyFrame")
+	-- Full screen and on top so keys reach it before other keyboard frames.
+	-- Mouse stays disabled, so it never blocks clicks.
+	keyFrame = CreateFrame("Frame", "LastRitesKeyFrame", UIParent)
+	keyFrame:SetAllPoints(UIParent)
+	keyFrame:SetFrameStrata("TOOLTIP")
+	keyFrame:EnableMouse(false)
 	keyFrame:SetPropagateKeyboardInput(true)
 	keyFrame:EnableKeyboard(true)
-	keyFrame:SetScript("OnKeyDown", function() ns.OnKeyPress() end)
+	keyFrame:SetScript("OnKeyDown", function(_, key) ns.OnKeyPress("key " .. tostring(key)) end)
+	keyFrame:Show()
 	return true
+end
+
+-- Backup: the game's own functions for using an ability (key or click) and
+-- starting to move run inside your press, so hooking them counts too.
+local HOOKS = {
+	"UseAction", "JumpOrAscendStart", "MoveForwardStart", "MoveBackwardStart",
+	"StrafeLeftStart", "StrafeRightStart", "TurnLeftStart", "TurnRightStart",
+}
+local function hookInputs()
+	for _, name in ipairs(HOOKS) do
+		if type(_G[name]) == "function" then
+			hooksecurefunc(name, function() ns.OnKeyPress(name) end)
+		end
+	end
 end
 
 ns.OnLogin(function()
@@ -368,6 +402,7 @@ ns.OnLogin(function()
 	frame:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player")
 	frame:RegisterEvent("ADDON_ACTION_BLOCKED")
 	if not setupKeyFrame() then frame:RegisterEvent("PLAYER_REGEN_ENABLED") end
+	hookInputs()
 	frame:RegisterEvent("ADDON_ACTION_FORBIDDEN")
 	frame:SetScript("OnEvent", function(_, event, ...)
 		if event == "PARTY_KILL" then
