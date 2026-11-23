@@ -25,6 +25,14 @@ local function words(s)
 	return n
 end
 
+-- Your faction sees the built-in emote and the line together, so a line must
+-- follow on from its emote instead of restating it ("/kneel" then "kneels...").
+local EMOTE_VERBS = {
+	PRAY = { "pray" }, KNEEL = { "kneel" }, BOW = { "bow" }, SALUTE = { "salut" }, MOURN = { "mourn" },
+	PITY = { "pit", "regards" }, VIOLIN = { "plays", "fiddles" }, GLOAT = { "gloat" }, COMFORT = { "comfort", "consol" },
+	SIGH = { "sigh" }, CRY = { "weep", "cries", "cry" }, SHRUG = { "shrug" },
+}
+
 local errors, total, hist = {}, 0, {}
 local seen = {}
 
@@ -50,6 +58,12 @@ local function check(label, pool)
 		end
 		if text:sub(1, 1):match("%u") and not text:match("^{") then
 			errors[#errors + 1] = ("%s: should start lowercase (your name is prefixed): %s"):format(where, text)
+		end
+		local first = (text:match("^(%a+)") or ""):lower()
+		for _, stem in ipairs(EMOTE_VERBS[token] or {}) do
+			if first:sub(1, #stem) == stem then
+				errors[#errors + 1] = ("%s: restates its /%s emote: %s"):format(where, token:lower(), text)
+			end
 		end
 		if seen[text] then errors[#errors + 1] = ("%s: duplicate of %s"):format(where, seen[text]) end
 		seen[text] = where

@@ -29,7 +29,8 @@ LastRites' logic is covered by the mocked-client tests in `tests/`, but kill eve
 
 | Check | Expected result |
 |---|---|
-| Detection | Land a killing blow on an enemy player. Debug prints `PARTY_KILL` with your GUID, and the rite plays. |
+| Detection | Land a killing blow on an enemy player. Debug prints `PARTY_KILL` with your GUID, `Your kill`, the emote, then `Prayer waits for your next keypress`. Your next key press sends the prayer. |
+| No key press | After a kill, press nothing for 2 seconds. Debug says the prayer was dropped, and it never appears later. |
 | Corpse target | When the corpse is still targeted, the emote names the victim. |
 | Others' kills | A kill by a teammate prints `PARTY_KILL` in debug but performs nothing. |
 | NPCs | Killing a creature performs nothing. |

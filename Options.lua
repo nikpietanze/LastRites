@@ -107,7 +107,7 @@ ns.OnLoad(function()
 	slider("cooldown", "Cooldown", 0, 120, 5, "%ds",
 		"The shortest time between two rites. Kills during the cooldown are still counted.", enabled, "enabled")
 	slider("delay", "Pause before the prayer", 0, 5, 0.5, "%.1fs",
-		"Wait this long after the built-in emote before the prayer. Only used with Emote and prayer. If chat locks down for addons during the pause, the prayer is skipped.",
+		"Wait this long after the built-in emote before the prayer. Only used with Emote and prayer. WoW only sends the prayer on a key press, so it goes out on your first key press after the pause.",
 		enabled, "enabled")
 
 	header("Nemesis")
@@ -119,7 +119,7 @@ ns.OnLoad(function()
 
 	button("Preview a rite", "Preview", function() ns.Preview() end,
 		"Print a sample rite in your chat window. Only you see it.")
-	button("Test on your target", "Test", function() ns.TestRite() end,
+	button("Test on your target", "Test", function() ns.TestRite(nil, true) end,
 		"Perform a real rite on your current target, so you can see how it looks. Everyone nearby sees it.")
 	button("Your nemeses", "Show", function() ns.Commands.stats() end,
 		"Print the players you've killed most on this character.")

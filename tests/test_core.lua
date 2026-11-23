@@ -41,13 +41,18 @@ end
 
 print("LastRites core tests")
 
-test("killing an enemy player plays a built-in emote and the prayer together", function()
+test("a kill plays the emote now and the prayer on your next key press", function()
 	local W = fresh()
 	W.target = { name = "Bob", guid = "Player-9-BOB" }
 	kill(W)
 	eq(#W.emotes, 1, "emotes")
 	eq(W.emotes[1][2], "target", "aimed at the corpse")
-	eq(#W.chat, 1, "prayer sent right away by default")
+	eq(#W.chat, 0, "no key press yet")
+	W.advance(0.2)
+	W.press()
+	eq(#W.chat, 1, "prayer on the key press")
+	W.press()
+	eq(#W.chat, 1, "only once")
 	eq(W.chat[1][2], "EMOTE")
 	assert(not W.chat[1][1]:find("[{}]"), "unfilled placeholder: " .. W.chat[1][1])
 end)
@@ -58,6 +63,7 @@ test("only ever uses the EMOTE channel", function()
 		addPlayer(W, "Player-9-X" .. i, "X" .. i)
 		W.advance(100)
 		kill(W, "Player-9-X" .. i)
+		W.press()
 	end
 	W.advance(5)
 	eq(#W.chat, 40)
@@ -176,11 +182,61 @@ test("mode builtin only plays the built-in emote", function()
 	eq(#W.emotes, 1); eq(#W.chat, 0)
 end)
 
-test("mode custom sends only the prayer, immediately", function()
+test("mode custom sends only the prayer", function()
 	local W = fresh()
 	W.ns.db.mode = "custom"
 	kill(W)
+	W.press()
 	eq(#W.emotes, 0); eq(#W.chat, 1)
+end)
+
+test("mode builtin never waits for a key press", function()
+	local W = fresh()
+	W.ns.db.mode = "builtin"
+	kill(W)
+	assert(not W.ns.HasQueuedPrayer())
+end)
+
+test("no key press in time: the prayer is dropped, never sent late", function()
+	local W = fresh()
+	W.slash("debug")
+	kill(W)
+	W.advance(1.6)
+	assert(not W.ns.HasQueuedPrayer())
+	assert(table.concat(W.printed, "\n"):find("No keypress in time"), "debug explains")
+	W.press()
+	eq(#W.chat, 0)
+end)
+
+test("the key frame passes keys through and is set up out of combat", function()
+	local W = fresh()
+	local keyFrames = 0
+	for _, f in ipairs(W.frames) do
+		if f.keyboard then
+			keyFrames = keyFrames + 1
+			eq(f.propagate, true, "keys pass through to the game")
+		end
+	end
+	eq(keyFrames, 1)
+end)
+
+test("logging in during combat sets up the key frame once combat ends", function()
+	local saved = nil
+	local W = mock.install(root, saved, function(W) W.combat = true end)
+	W.players["Player-9-BOB"] = { class = "Rogue", race = "Undead", name = "Bob" }
+	local function keyFrames()
+		local n = 0
+		for _, f in ipairs(W.frames) do if f.keyboard then n = n + 1 end end
+		return n
+	end
+	eq(keyFrames(), 0, "not in combat")
+	W.combat = false
+	W.fire("PLAYER_REGEN_ENABLED")
+	eq(keyFrames(), 1, "after combat")
+	W.fire("PLAYER_REGEN_ENABLED")
+	eq(keyFrames(), 1, "only once")
+	kill(W); W.press()
+	eq(#W.chat, 1)
 end)
 
 test("a pause delays the prayer", function()
@@ -188,9 +244,11 @@ test("a pause delays the prayer", function()
 	W.ns.db.delay = 1.5
 	kill(W)
 	eq(#W.emotes, 1)
-	eq(#W.chat, 0, "prayer waits")
+	W.press()
+	eq(#W.chat, 0, "key presses during the pause don't count")
 	W.advance(1.5)
-	eq(#W.chat, 1, "prayer after the pause")
+	W.press()
+	eq(#W.chat, 1, "first key press after the pause")
 end)
 
 test("a kill during chat lockdown gets no rite, now or later", function()
@@ -224,6 +282,7 @@ test("prayer is dropped if lockdown starts during the pause", function()
 	kill(W)
 	W.lockdown = true
 	W.advance(1)
+	W.press()
 	W.lockdown = false
 	W.advance(60)
 	eq(#W.emotes, 1, "emote played")
@@ -289,7 +348,7 @@ test("third kill of the same player gets a nemesis line", function()
 	for _, p in ipairs(W.ns.Prayers.nemesis.satire) do
 		set[W.ns.Fill(p[2], { name = "Bob", count = 3, nth = "3rd", zone = "Warsong Gulch" })] = true
 	end
-	for _ = 1, 3 do W.advance(100); kill(W) end
+	for _ = 1, 3 do W.advance(100); kill(W); W.press() end
 	assert(set[W.chat[3][1]], "3rd kill should be a nemesis line: " .. W.chat[3][1])
 end)
 
@@ -363,6 +422,7 @@ test("/rites test performs on your target, ignoring cooldown and zone", function
 	W.slash("test")
 	W.slash("test")
 	eq(#W.emotes, 2)
+	eq(#W.chat, 2, "a slash command is a key press, so the prayer goes right away")
 	eq(W.ns.db.kills.Bob, nil, "tests don't count as kills")
 end)
 
@@ -409,6 +469,7 @@ test("debug explains every reason a kill gets no rite", function()
 	assert(lastDebug():find("turned off"), lastDebug())
 	W.ns.db.enabled = true
 	kill(W)
+	W.press()
 	local out = table.concat(W.printed, "\n")
 	assert(out:find("Your kill: Bob") and out:find("Emote /%a+ at none %(WoW returned true%)") and out:find("Sending prayer"), out)
 end)

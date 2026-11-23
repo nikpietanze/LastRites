@@ -14,7 +14,7 @@ local function tocFiles(root)
 	return files
 end
 
-function M.install(root, savedDB)
+function M.install(root, savedDB, beforeLogin)
 	local W = {
 		time = 1000,
 		emotes = {}, -- { token, target }
@@ -25,6 +25,7 @@ function M.install(root, savedDB)
 		zone = "Warsong Gulch",
 		instance = { false, "none" },
 		dead = false,
+		combat = false,
 		lockdown = false,
 		players = {}, -- [guid] = { class, race, name }
 		harmful = {}, -- [spellID] = true
@@ -74,12 +75,24 @@ function M.install(root, savedDB)
 	end
 	_G.GameTooltip = setmetatable({}, { __index = function() return function() end end })
 	_G.SlashCmdList = {}
+	_G.InCombatLockdown = function() return W.combat end
 	_G.CreateFrame = function()
-		local f = { events = {} }
+		local f = { events = {}, scripts = {} }
 		function f:RegisterEvent(e) self.events[e] = true end
 		function f:RegisterUnitEvent(e) self.events[e] = true end
 		function f:UnregisterEvent(e) self.events[e] = nil end
-		function f:SetScript(_, fn) self.onEvent = fn end
+		function f:SetScript(name, fn)
+			self.scripts[name] = fn
+			if name == "OnEvent" then self.onEvent = fn end
+		end
+		function f:EnableKeyboard(v)
+			assert(not W.combat, "EnableKeyboard in combat")
+			self.keyboard = v
+		end
+		function f:SetPropagateKeyboardInput(v)
+			assert(not W.combat, "SetPropagateKeyboardInput in combat")
+			self.propagate = v
+		end
 		W.frames[#W.frames + 1] = f
 		return f
 	end
@@ -127,6 +140,15 @@ function M.install(root, savedDB)
 		end
 		for _, t in ipairs(due) do t.fn() end
 	end
+	-- A real key press: keyboard frames see it (and must pass it on).
+	function W.press(key)
+		for _, f in ipairs(W.frames) do
+			if f.keyboard and f.scripts.OnKeyDown then
+				assert(f.propagate, "keyboard frame swallows keys")
+				f.scripts.OnKeyDown(f, key or "1")
+			end
+		end
+	end
 	function W.clear() W.emotes, W.chat, W.printed = {}, {}, {} end
 	function W.slash(msg) SlashCmdList.LASTRITES(msg) end
 
@@ -137,6 +159,7 @@ function M.install(root, savedDB)
 	end
 	W.ns = ns
 	W.fire("ADDON_LOADED", "LastRites")
+	if beforeLogin then beforeLogin(W) end
 	W.fire("PLAYER_LOGIN")
 	return W
 end

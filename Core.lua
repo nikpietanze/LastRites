@@ -153,7 +153,7 @@ local commands = {
 		local name, kills = args:match("^(%S*)%s*(%d*)$")
 		ns.Preview(name ~= "" and name or nil, tonumber(kills))
 	end,
-	test = function(args) ns.TestRite(args ~= "" and args or nil) end,
+	test = function(args) ns.TestRite(args ~= "" and args or nil, true) end,
 	stats = printStats,
 	status = printStatus,
 	debug = function()

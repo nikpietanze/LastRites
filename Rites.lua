@@ -5,9 +5,15 @@
 -- spell from the player's own successful casts. Chat can be locked down by the
 -- client; a rite is only worth it in the moment, so a kill during a lockdown
 -- gets no rite, and a prayer blocked during the pause is dropped.
+--
+-- WoW only lets addons send /e text during a real keypress or click. The
+-- built-in emote plays right away on the kill; the prayer goes out on your
+-- next keypress, which in PvP is a fraction of a second later. No keypress
+-- within KEY_WINDOW and the prayer is dropped, never sent late.
 local _, ns = ...
 
 local SPELL_WINDOW = 6 -- A cast this recent counts as the killing spell.
+local KEY_WINDOW = 1.5 -- Seconds the prayer waits for a keypress before it's dropped.
 
 local FALLBACK = {
 	class = "adventurer",
@@ -160,17 +166,49 @@ local function corpseTargeted(name)
 	return UnitExists("target") and not UnitIsUnit("target", "player") and stripRealm(UnitName("target")) == name
 end
 
+local queued -- { text, from, to }: a prayer waiting for a keypress
+
 local function sendPrayer(text)
 	if ns.InChatLockdown() then
-		ns.Debug("Chat locked down during the pause; prayer dropped.")
+		ns.Debug("Chat locked down; prayer dropped.")
 		return
 	end
 	ns.Debug("Sending prayer.")
 	sendEmote(text)
 end
 
--- Plays the built-in emote, then the prayer after the pause.
-function ns.Perform(prayer, ctx)
+-- Called on every key press (the keys still reach the game as normal).
+function ns.OnKeyPress()
+	if not queued then return end
+	local t = now()
+	if t < queued.from then return end
+	local entry = queued
+	queued = nil
+	if t > entry.to then return end
+	sendPrayer(entry.text)
+end
+
+local function queuePrayer(text, delay)
+	local t = now()
+	local entry = { text = text, from = t + delay, to = t + delay + KEY_WINDOW }
+	queued = entry
+	ns.Debug("Prayer waits for your next keypress.")
+	C_Timer.After(delay + KEY_WINDOW, function()
+		if queued == entry then
+			queued = nil
+			ns.Debug("No keypress in time; prayer dropped.")
+		end
+	end)
+end
+
+function ns.HasQueuedPrayer()
+	return queued ~= nil
+end
+
+-- Plays the built-in emote, then the prayer after the pause. fromKeypress:
+-- this call already runs inside a keypress or click (slash command, button),
+-- so the prayer can go out right away when there's no pause.
+function ns.Perform(prayer, ctx, fromKeypress)
 	local token, text = prayer[1], ns.Fill(prayer[2], ctx)
 	local mode = ns.db.mode
 	if mode ~= "custom" then
@@ -181,10 +219,10 @@ function ns.Perform(prayer, ctx)
 	end
 	if mode ~= "builtin" then
 		local delay = mode == "both" and ns.db.delay or 0
-		if delay > 0 then
-			C_Timer.After(delay, function() sendPrayer(text) end)
-		else
+		if fromKeypress and delay == 0 then
 			sendPrayer(text)
+		else
+			queuePrayer(text, delay)
 		end
 	end
 	return text
@@ -244,7 +282,7 @@ function ns.Preview(name, kills)
 end
 
 -- Performs a real rite, ignoring cooldown, chance and zone settings.
-function ns.TestRite(name)
+function ns.TestRite(name, fromKeypress)
 	local guid
 	if not name and UnitExists("target") and UnitIsPlayer("target") then
 		name = stripRealm(UnitName("target"))
@@ -259,7 +297,7 @@ function ns.TestRite(name)
 		return
 	end
 	local count = (ns.db.kills[name] or 0) + 1
-	ns.Perform(ns.Pick(count), ns.BuildContext(name, guid, count))
+	ns.Perform(ns.Pick(count), ns.BuildContext(name, guid, count), fromKeypress)
 end
 
 function ns.ResetCooldown()
@@ -310,12 +348,26 @@ function ns.LastCastName()
 	return lastCast and lastCast.name
 end
 
+-- A keyboard-enabled frame that passes every key through to the game. Its
+-- propagation can't be set during combat, so set it up once out of combat.
+local keyFrame
+local function setupKeyFrame()
+	if keyFrame then return true end
+	if InCombatLockdown() then return false end
+	keyFrame = CreateFrame("Frame", "LastRitesKeyFrame")
+	keyFrame:SetPropagateKeyboardInput(true)
+	keyFrame:EnableKeyboard(true)
+	keyFrame:SetScript("OnKeyDown", function() ns.OnKeyPress() end)
+	return true
+end
+
 ns.OnLogin(function()
 	playerGUID = UnitGUID("player")
 	local frame = CreateFrame("Frame")
 	frame:RegisterEvent("PARTY_KILL")
 	frame:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player")
 	frame:RegisterEvent("ADDON_ACTION_BLOCKED")
+	if not setupKeyFrame() then frame:RegisterEvent("PLAYER_REGEN_ENABLED") end
 	frame:RegisterEvent("ADDON_ACTION_FORBIDDEN")
 	frame:SetScript("OnEvent", function(_, event, ...)
 		if event == "PARTY_KILL" then
@@ -323,6 +375,8 @@ ns.OnLogin(function()
 		elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
 			local _, _, spellID = ...
 			ns.OnSpellCast(spellID)
+		elseif event == "PLAYER_REGEN_ENABLED" then
+			if setupKeyFrame() then frame:UnregisterEvent("PLAYER_REGEN_ENABLED") end
 		elseif event == "ADDON_ACTION_BLOCKED" or event == "ADDON_ACTION_FORBIDDEN" then
 			local addon, func = ...
 			ns.Debug(("%s: %s tried %s."):format(event, tostring(addon), tostring(func)))
